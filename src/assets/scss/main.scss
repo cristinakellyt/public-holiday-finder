@@ -1,0 +1,9 @@
+// Use abstract files
+@use 'abstract/functions' as *;
+@use 'abstract/mixins' as *;
+@use 'abstract/variables' as *;
+
+// Use base styles
+@use 'base/base' as *;
+
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');

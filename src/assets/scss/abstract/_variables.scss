@@ -1,0 +1,72 @@
+@use 'functions' as fn;
+
+// COLORS
+$color-primary: #009580;
+$color-primary-2: #144c44;
+
+//GREEN COLORS
+$green-1: #e5f4f2;
+$green-2: #309b42;
+
+//GREY COLORS
+$pure-white: #ffffff;
+
+$gray: #e4e7eb;
+$gray-100: #f5f7fa;
+$gray-200: #ededee;
+$gray-300: #c0c0c0;
+$gray-400: #818181;
+$gray-500: #47464a;
+$gray-600: #626364;
+$gray-700: #464f58;
+$gray-800: #1f2933;
+$gray-900: #202020;
+
+// ORANGE COLORS
+$orange: #ff7f00;
+
+// RED COLORS
+$red: #ea5555;
+
+// TYPOGRAPHY
+
+$main-font-family: 'Poppins', sans-serif;
+$secondary-font-family: 'Manrope', sans-serif;
+$text-color: #4d5966;
+
+// UTILITIES
+
+$max-width: fn.pxToRem(1440);
+
+$navSideBar-max-width: fn.pxToRem(280);
+$navSideBar-collapsed-width: fn.pxToRem(100);
+
+// PLACEHOLDERS SELECTOR
+
+%flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+%flex-column-centralize {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+%flex-row-centralize {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// MEDIA-QUERY
+
+$desktop: 112.5em; // 1800px
+$laptop: 90em; // 1440px
+$laptop-medium: 64em; // 1024px
+$tablet: 48em; //768px
+$mobile-large: 26.563em; //425px
+$mobile-medium: 23.438em; //375px
+$mobile-small: 20em; //320px
