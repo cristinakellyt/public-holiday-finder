@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 //Vue
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 // Components
 import SearchBar from '@/components/BasicComponents/SearchBar.vue'
@@ -34,14 +34,14 @@ import type { Country } from '@/types/country'
 
 const publicHolidaysStore = usePublicHolidaysStore()
 
-onMounted(async () => {
-  try {
-    await publicHolidaysStore.fetchAvailableCountries()
-  } catch (error) {
-    searchError.value = true
-    console.error(error)
-  }
-})
+// onMounted(async () => {
+//   try {
+//     await publicHolidaysStore.fetchAvailableCountries()
+//   } catch (error) {
+//     searchError.value = true
+//     console.error(error)
+//   }
+// })
 
 const { availableCountries } = storeToRefs(publicHolidaysStore)
 const filteredCountries = ref<Country[] | null>(null)

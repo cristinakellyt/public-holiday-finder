@@ -5,8 +5,6 @@
 </template>
 
 <style scoped lang="scss">
-@import '@/assets/scss/main.scss';
-
 .base-width {
   max-width: $max-width;
   margin: 0 auto;

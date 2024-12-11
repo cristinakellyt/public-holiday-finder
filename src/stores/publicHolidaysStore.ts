@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Country } from '@/types/country'
-
+import type { PublicHoliday } from '@/types/publicHolidays'
 const API_URL = 'https://date.nager.at/api/v3/'
 
 export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   const availableCountries = ref<Country[]>([])
+  const publicHolidaysWorldwide = ref<PublicHoliday[]>([])
 
   const fetchAvailableCountries = async () => {
     try {
@@ -18,5 +19,21 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     }
   }
 
-  return { availableCountries, fetchAvailableCountries }
+  const fetchPublicHolidaysWorldwide = async () => {
+    try {
+      const response = await fetch(`${API_URL}NextPublicHolidaysWorldwide`)
+      const data = await response.json()
+      publicHolidaysWorldwide.value = data
+    } catch (error) {
+      console.error(error)
+      throw new Error('Error fetching public holidays')
+    }
+  }
+
+  return {
+    availableCountries,
+    fetchAvailableCountries,
+    publicHolidaysWorldwide,
+    fetchPublicHolidaysWorldwide,
+  }
 })
