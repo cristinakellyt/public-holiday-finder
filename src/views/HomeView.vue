@@ -1,13 +1,14 @@
 <template>
   <main>
-    <h1>Home</h1>
+    <BaseWidth>
+      <SearchCountry />
+    </BaseWidth>
   </main>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+//Components
+import SearchCountry from '@/components/SearchCountry.vue'
+</script>
 
-<style scoped lang="scss">
-h1 {
-  color: $color-primary;
-}
-</style>
+<style scoped lang="scss"></style>
