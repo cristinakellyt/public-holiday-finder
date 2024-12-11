@@ -12,6 +12,7 @@
 body {
   font-family: vars.$main-font-family;
   font-size: fn.pxToRem(15);
+  background-color: vars.$gray-100;
 }
 
 ul {
@@ -31,4 +32,17 @@ a {
 
 p {
   line-height: 1.6;
+}
+
+::-webkit-scrollbar {
+  width: fn.pxToRem(8);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: vars.$gray-300;
+  border-radius: fn.pxToRem(10);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: vars.$gray-400;
 }
