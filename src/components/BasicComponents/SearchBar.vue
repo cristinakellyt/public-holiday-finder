@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 // Vue
-import { ref, type PropType } from 'vue'
+import { ref, type PropType, watch } from 'vue'
 // Icons
 import icSearch from '@/assets/icons/ic_search.svg'
 import icClear from '@/assets/icons/ic_close-circle.svg'
@@ -43,10 +43,14 @@ const props = defineProps({
     type: Number,
     default: 0,
   },
+  searchQuery: {
+    type: String,
+    default: '',
+  },
 })
 
 const queryTimeout = ref<ReturnType<typeof setTimeout>>()
-const searchKey = ref('')
+const searchKey = ref(props.searchQuery)
 
 const onInputSearch = () => {
   clearTimeout(queryTimeout.value)
@@ -62,6 +66,14 @@ const onClearSearchKey = () => {
   searchKey.value = ''
   emit('onSearch', searchKey.value)
 }
+
+//watch searchQuery
+watch(
+  () => props.searchQuery,
+  (newVal) => {
+    searchKey.value = newVal
+  },
+)
 </script>
 
 <style scoped lang="scss">

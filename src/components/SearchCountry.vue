@@ -1,6 +1,16 @@
 <template>
+  <div
+    class="backdrop"
+    v-if="filteredCountries !== null || searchKey"
+    @click="closePopUpList"
+  ></div>
   <div class="search-country-wrapper">
-    <SearchBar placeholder="Search for a country" :debounce-time="300" @onSearch="fetchLocations" />
+    <SearchBar
+      placeholder="Search for a country"
+      :debounce-time="300"
+      :search-query="searchKey"
+      @onSearch="fetchLocations"
+    />
     <PopUpList
       v-if="filteredCountries !== null || searchKey"
       :locations-result="filteredCountries"
@@ -56,6 +66,11 @@ const fetchLocations = (searchQuery: string) => {
 const selectLocation = (location: Country) => {
   console.log(location)
 }
+
+const closePopUpList = () => {
+  filteredCountries.value = null
+  searchKey.value = ''
+}
 </script>
 
 <style scoped lang="scss">
@@ -63,5 +78,14 @@ const selectLocation = (location: Country) => {
   position: relative;
   max-width: pxToRem(600);
   margin: 0 auto;
+}
+
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
 }
 </style>

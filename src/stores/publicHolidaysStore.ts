@@ -13,6 +13,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       const data = await response.json()
       availableCountries.value = data
     } catch (error) {
+      console.error(error)
       throw new Error('Error fetching available countries')
     }
   }
