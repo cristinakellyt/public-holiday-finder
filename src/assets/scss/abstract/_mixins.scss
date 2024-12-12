@@ -3,3 +3,11 @@
     @content;
   }
 }
+
+@mixin flex-gap($direction, $gap, $align-items: center, $justify-content: center) {
+  display: flex;
+  flex-direction: $direction;
+  gap: $gap;
+  align-items: $align-items;
+  justify-content: $justify-content;
+}
