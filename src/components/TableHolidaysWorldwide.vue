@@ -1,9 +1,9 @@
 <template>
   <BaseTable
     class="table-holidays-worldwide"
-    v-if="tableData.length > 0"
+    v-if="publicHolidaysWorldwide.length > 0"
     :options="tableOptions"
-    :tableData="tableData"
+    :table-data="publicHolidaysWorldwide"
   >
     <template #title>
       <h2>Public Holidays Worldwide</h2>
@@ -33,20 +33,17 @@
 
 <script setup lang="ts">
 //Vue
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
-//Types
-import type { PublicHoliday } from '@/types/publicHolidays'
 //Utils
 import dateFormatter from '@/utils/dateFormatter'
-import getWikipediaLink from '@/utils/wikipediaPage'
-import fetchCountryFlag from '@/utils/countryFlag'
 //Icons
 import icRedirectLink from '@/assets/icons/ic_redirect_link.svg'
 
 const publicHolidaysStore = usePublicHolidaysStore()
+
 const tableOptions = {
   headings: {
     date: 'Date',
@@ -55,38 +52,12 @@ const tableOptions = {
   },
 }
 
-const { publicHolidaysWorldwide, availableCountries } = storeToRefs(publicHolidaysStore)
-
-const tableData = ref<PublicHoliday[]>([])
+const { publicHolidaysWorldwide } = storeToRefs(publicHolidaysStore)
 
 //Fetch public holidays worldwide and fill data with flags and country name to display in table
 onMounted(async () => {
   try {
     await publicHolidaysStore.fetchPublicHolidaysWorldwide()
-    const holidays = JSON.parse(JSON.stringify(publicHolidaysWorldwide.value))
-    //Fill data with flags by calling fillDataWithFlags
-    await Promise.all(
-      holidays.map(async (holiday: PublicHoliday) => {
-        const flagUrl = await fetchCountryFlag(holiday.countryCode)
-        holiday.flagUrl = flagUrl
-      }),
-    )
-    //Fill data with country name
-    holidays.map((holiday: PublicHoliday) => {
-      const countryName = availableCountries.value.find(
-        (country) => country.countryCode === holiday.countryCode,
-      )?.name
-      holiday.countryName = countryName
-    })
-
-    //Fill data with wikipedia link
-    await Promise.all(
-      holidays.map(async (holiday: PublicHoliday) => {
-        holiday.wikipediaLink = await getWikipediaLink(holiday.name)
-      }),
-    )
-
-    tableData.value = holidays
   } catch (error) {
     console.error(error)
   }
