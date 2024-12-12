@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <BaseTable :table-data="lastCountrySearched.holidays" :options="tableOptions">
+  <div class="last-searched-country-wrapper">
+    <BaseTable :table-data="tableData" :options="tableOptions">
       <template #title>
         <h2 class="title">
           Public Holidays for {{ lastCountrySearched.countryName }}
@@ -18,7 +18,7 @@
       </template>
 
       <template #name="{ rowData }">
-        <div class="centralized-container" @click="goToHolidayInfo(rowData.wikipediaLink)">
+        <div class="centralized-container" @click="goToURL(rowData.wikipediaLink)">
           <span class="name" :class="{ link: rowData.wikipediaLink }">{{ rowData.name }}</span>
           <img
             v-if="rowData.wikipediaLink"
@@ -29,12 +29,19 @@
         </div>
       </template>
     </BaseTable>
+    <BasePagination
+      v-if="lastCountrySearched.holidays.length > pageSize"
+      :page-size="pageSize"
+      :total-items="lastCountrySearched.holidays.length"
+      :current-page="currentPage"
+      @updateCurrentPage="updatePage"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 //Vue
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 //Types
 import type { TableOptions } from '@/types/tableOptions'
@@ -42,11 +49,15 @@ import type { TableOptions } from '@/types/tableOptions'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 //Utils
 import dateFormatter from '@/utils/dateFormatter'
+import goToURL from '@/utils/goToURL'
 //Icons
 import icRedirectLink from '@/assets/icons/ic_redirect_link.svg'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
+const tableData = ref(lastCountrySearched.value.holidays)
+const currentPage = ref(1)
+const pageSize = ref(5)
 
 const tableOptions = ref<TableOptions>({
   headings: {
@@ -55,14 +66,27 @@ const tableOptions = ref<TableOptions>({
   },
 })
 
-const goToHolidayInfo = (wikipediaLink: string) => {
-  if (wikipediaLink) {
-    window.open(wikipediaLink, '_blank')
-  }
+const updatePage = (page: number) => {
+  currentPage.value = page
+  getPaginatedData()
 }
+
+const getPaginatedData = () => {
+  const startIndex = (currentPage.value - 1) * pageSize.value
+  const endIndex = currentPage.value * pageSize.value
+  tableData.value = lastCountrySearched.value.holidays.slice(startIndex, endIndex)
+}
+
+onMounted(() => {
+  getPaginatedData()
+})
 </script>
 
 <style scoped lang="scss">
+.last-searched-country-wrapper {
+  max-width: pxToRem(800);
+}
+
 .title {
   @include flex-gap(row, pxToRem(10), center, center);
 }

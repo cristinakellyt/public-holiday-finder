@@ -101,7 +101,7 @@ defineProps({
 
   .cell-base-table {
     background-color: $pure-white;
-    padding: pxToRem(22) pxToRem(16);
+    padding: pxToRem(18) pxToRem(16);
     border-bottom: pxToRem(1) solid $gray-200;
     font-weight: 500;
 
