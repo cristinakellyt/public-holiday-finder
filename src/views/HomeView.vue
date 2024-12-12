@@ -3,30 +3,29 @@
     <BaseWidth v-if="availableCountries.length > 0">
       <SearchCountry />
       <TableHolidaysWorldwide />
+      <LastSearchedCountryHolidayTable
+        v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
+      />
     </BaseWidth>
   </main>
 </template>
 
 <script setup lang="ts">
 //Vue
-import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 //Components
 import SearchCountry from '@/components/SearchCountry.vue'
 import TableHolidaysWorldwide from '@/components/TableHolidaysWorldwide.vue'
+import LastSearchedCountryHolidayTable from '@/components/LastSearchedCountryHolidayTable.vue'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
+import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 
 const publicHolidaysStore = usePublicHolidaysStore()
-const { availableCountries } = storeToRefs(publicHolidaysStore)
+const lastCountrySearchedStore = useLastCountrySearchedStore()
 
-onMounted(async () => {
-  try {
-    await publicHolidaysStore.fetchAvailableCountries()
-  } catch (error) {
-    console.error(error)
-  }
-})
+const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
+const { availableCountries } = storeToRefs(publicHolidaysStore)
 </script>
 
 <style scoped lang="scss"></style>
