@@ -1,34 +1,44 @@
 <template>
   <div class="last-searched-country-wrapper">
     <BaseTable :table-data="tableData" :options="tableOptions">
+      <!-- Title -->
       <template #title>
         <h2 class="title">
-          Public Holidays for {{ lastCountrySearched.countryName }}
+          Public Holidays in {{ lastCountrySearched.countryName }}
           <img
             v-if="lastCountrySearched.countryFlagUrl"
             :src="lastCountrySearched.countryFlagUrl"
             alt="country-flag"
           />
         </h2>
-        <p class="subtitle">*This was your last searched country</p>
       </template>
-
+      <!-- Date -->
       <template #date="{ rowData }">
         {{ dateFormatter(rowData.date) }}
       </template>
-
+      <!-- Holiday Name -->
       <template #name="{ rowData }">
-        <div class="centralized-container" @click="goToURL(rowData.wikipediaLink)">
-          <span class="name" :class="{ link: rowData.wikipediaLink }">{{ rowData.name }}</span>
+        <div class="centralized-container" role="link">
+          <!-- If wikipedia link is not empty, we can click on the name and it will redirect to the wikipedia page -->
+          <a
+            v-if="rowData.wikipediaLink"
+            class="name"
+            :class="{ link: rowData.wikipediaLink }"
+            :href="rowData.wikipediaLink"
+            target="_blank"
+            >{{ rowData.name }}</a
+          >
           <img
             v-if="rowData.wikipediaLink"
             :src="icRedirectLink"
             alt="redirect-link"
             class="redirect-link"
           />
+          <span v-else class="name">{{ rowData.name }}</span>
         </div>
       </template>
     </BaseTable>
+    <!-- Pagination -->
     <BasePagination
       v-if="lastCountrySearched.holidays.length > pageSize"
       :page-size="pageSize"
@@ -49,11 +59,11 @@ import type { TableOptions } from '@/types/tableOptions'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 //Utils
 import dateFormatter from '@/utils/dateFormatter'
-import goToURL from '@/utils/goToURL'
 //Icons
 import icRedirectLink from '@/assets/icons/ic_redirect_link.svg'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
+
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
 const tableData = ref(lastCountrySearched.value.holidays)
 const currentPage = ref(1)
@@ -89,6 +99,8 @@ onMounted(() => {
 
 .title {
   @include flex-gap(row, pxToRem(10), center, center);
+  font-size: pxToRem(22);
+  font-weight: 500;
 }
 
 .subtitle {
@@ -111,7 +123,6 @@ onMounted(() => {
 
 .centralized-container {
   @include flex-gap(row, pxToRem(10), center, flex-start);
-  width: max-content;
 }
 
 .redirect-link {

@@ -8,7 +8,6 @@
 import { onMounted } from 'vue'
 //Components
 import TheHeader from '@/components/layout/TheHeader.vue'
-
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'

@@ -1,4 +1,5 @@
 <template>
+  <div class="backdrop" @click="emit('closePopUpList')"></div>
   <ul class="pop-up-list-wrapper">
     <p class="pop-up-list-error" v-if="searchError">
       Sorry, something went wrong with the search, please try again.
@@ -17,6 +18,8 @@
         v-for="result in locationsResult"
         :key="result.countryCode"
         @click="emit('selectLocation', result)"
+        @keydown.enter="emit('selectLocation', result)"
+        tabindex="0"
       >
         {{ result.name }}
       </li>
@@ -41,10 +44,20 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['selectLocation'])
+const emit = defineEmits(['selectLocation', 'closePopUpList'])
 </script>
 
 <style scoped lang="scss">
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  z-index: 999;
+}
+
 .pop-up-list-wrapper {
   position: absolute;
   top: 100%;

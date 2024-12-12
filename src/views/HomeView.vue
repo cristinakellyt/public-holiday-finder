@@ -2,8 +2,13 @@
   <main>
     <BaseWidth v-if="availableCountries.length > 0">
       <SearchCountry />
+      <MapComponent
+        :clickable-countries="getCountriesNames"
+        @onCountrySelected="onCountrySelected"
+        :selected-country="lastCountrySearched.countryName"
+      />
       <TableHolidaysWorldwide />
-      <LastSearchedCountryHolidayTable
+      <LastSearchedCountrySection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
       />
     </BaseWidth>
@@ -13,10 +18,12 @@
 <script setup lang="ts">
 //Vue
 import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 //Components
 import SearchCountry from '@/components/SearchCountry.vue'
 import TableHolidaysWorldwide from '@/components/TableHolidaysWorldwide.vue'
-import LastSearchedCountryHolidayTable from '@/components/LastSearchedCountryHolidayTable.vue'
+import LastSearchedCountrySection from '@/components/LastSearchedCountrySection.vue'
+import MapComponent from '@/components/MapComponent.vue'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
@@ -26,6 +33,18 @@ const lastCountrySearchedStore = useLastCountrySearchedStore()
 
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
 const { availableCountries } = storeToRefs(publicHolidaysStore)
+
+const getCountriesNames = computed(() => availableCountries.value.map((country) => country.name))
+
+// Find country code selected in the map and set it in the store
+const onCountrySelected = async (countryName: string) => {
+  const countryCode = availableCountries.value.find(
+    (country) => country.name === countryName,
+  )?.countryCode
+  if (countryCode) {
+    await lastCountrySearchedStore.setLastCountrySearched(countryCode)
+  }
+}
 </script>
 
 <style scoped lang="scss"></style>

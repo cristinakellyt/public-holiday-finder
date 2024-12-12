@@ -16,6 +16,7 @@
       :locations-result="filteredCountries"
       :search-error="searchError"
       @select-location="selectLocation"
+      @close-pop-up-list="closePopUpList"
     />
   </div>
 </template>

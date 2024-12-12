@@ -55,8 +55,6 @@ defineProps({
   width: 100%;
   padding: pxToRem(14) pxToRem(10);
   text-align: center;
-  font-size: pxToRem(18);
-  font-weight: 700;
   color: $pure-white;
   border-bottom: pxToRem(1) solid $gray-300;
   border-top-left-radius: pxToRem(10);

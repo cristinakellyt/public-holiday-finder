@@ -17,11 +17,15 @@ export const useWikipediaLinksStore = defineStore('wikipediaLinks', () => {
 
   //Fetch wikipedia link from wikipedia api and save it in the state management
   const fetchWikipediaLink = async (holidayName: string): Promise<string | null> => {
+    // To have a better match, we use the wikipedia api to search for the holiday name
+    // if the is no 'holiday' string in the holiday name, we search we concact hollidayName
+    // with 'holiday' string
+    const searchQuery = holidayName.includes('holiday') ? holidayName : holidayName + ' holiday'
     const baseUrl = 'https://en.wikipedia.org/w/api.php'
     const params = new URLSearchParams({
       action: 'query',
       list: 'search',
-      srsearch: holidayName,
+      srsearch: searchQuery,
       format: 'json',
       origin: '*',
     })
