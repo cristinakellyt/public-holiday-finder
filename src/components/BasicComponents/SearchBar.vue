@@ -1,6 +1,6 @@
 <template>
   <div class="search-bar-wrapper">
-    <img :class="`search-icon ${size}`" :src="icSearch" />
+    <img :class="`search-icon ${size}`" :src="icSearch" alt="search" />
     <input
       id="search-input"
       v-model.trim="searchKey"
@@ -10,6 +10,9 @@
       :placeholder="placeholder"
       :aria-label="placeholder"
       @input="onInputSearch"
+      @keydown.down.prevent="emit('onArrowDown')"
+      @keydown.up.prevent="emit('onArrowUp')"
+      @keydown.enter="emit('onEnter')"
     />
     <img
       v-show="searchKey"
@@ -28,7 +31,7 @@ import { ref, type PropType, watch } from 'vue'
 import icSearch from '@/assets/icons/ic_search.svg'
 import icClear from '@/assets/icons/ic_close-circle.svg'
 
-const emit = defineEmits(['onSearch'])
+const emit = defineEmits(['onSearch', 'onArrowDown', 'onArrowUp', 'onEnter'])
 
 const props = defineProps({
   size: {

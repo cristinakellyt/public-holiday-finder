@@ -10,9 +10,13 @@
       :debounce-time="200"
       :search-query="searchKey"
       @onSearch="fetchLocations"
+      @onArrowDown="handleArrowDown"
+      @onArrowUp="handleArrowUp"
+      @onEnter="handleEnter"
     />
     <PopUpList
       v-if="filteredCountries !== null || searchKey"
+      ref="popupListRef"
       :locations-result="filteredCountries"
       :search-error="searchError"
       @select-location="selectLocation"
@@ -40,6 +44,7 @@ const { availableCountries } = storeToRefs(publicHolidaysStore)
 const filteredCountries = ref<Country[] | null>(null)
 const searchError = ref<boolean>(false)
 const searchKey = ref<string>('')
+const popupListRef = ref<InstanceType<typeof PopUpList> | null>(null)
 
 const fetchLocations = (searchQuery: string) => {
   searchKey.value = searchQuery
@@ -64,6 +69,19 @@ const selectLocation = async (location: Country) => {
 const closePopUpList = () => {
   filteredCountries.value = null
   searchKey.value = ''
+}
+
+const handleArrowDown = () => {
+  console.log('handleArrowDown')
+  popupListRef.value?.moveDown()
+}
+
+const handleArrowUp = () => {
+  popupListRef.value?.moveUp()
+}
+
+const handleEnter = () => {
+  popupListRef.value?.selectCurrent()
 }
 </script>
 
