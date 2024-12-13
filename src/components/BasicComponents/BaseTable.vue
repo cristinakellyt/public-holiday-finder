@@ -55,8 +55,6 @@ defineProps({
   width: 100%;
   padding: pxToRem(14) pxToRem(10);
   text-align: center;
-  font-size: pxToRem(18);
-  font-weight: 700;
   color: $pure-white;
   border-bottom: pxToRem(1) solid $gray-300;
   border-top-left-radius: pxToRem(10);
@@ -98,10 +96,11 @@ defineProps({
 
 .row-base-table {
   vertical-align: middle;
+  height: pxToRem(60);
 
   .cell-base-table {
     background-color: $pure-white;
-    padding: pxToRem(22) pxToRem(16);
+    padding: pxToRem(18) pxToRem(16);
     border-bottom: pxToRem(1) solid $gray-200;
     font-weight: 500;
 

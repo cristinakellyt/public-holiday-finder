@@ -7,15 +7,20 @@
   <div class="search-country-wrapper">
     <SearchBar
       placeholder="Search for a country"
-      :debounce-time="300"
+      :debounce-time="200"
       :search-query="searchKey"
       @onSearch="fetchLocations"
+      @onArrowDown="handleArrowDown"
+      @onArrowUp="handleArrowUp"
+      @onEnter="handleEnter"
     />
     <PopUpList
       v-if="filteredCountries !== null || searchKey"
+      ref="popupListRef"
       :locations-result="filteredCountries"
       :search-error="searchError"
       @select-location="selectLocation"
+      @close-pop-up-list="closePopUpList"
     />
   </div>
 </template>
@@ -29,24 +34,17 @@ import SearchBar from '@/components/BasicComponents/SearchBar.vue'
 import PopUpList from '@/components/BasicComponents/PopUpList.vue'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
+import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 // Types
 import type { Country } from '@/types/country'
 
 const publicHolidaysStore = usePublicHolidaysStore()
-
-// onMounted(async () => {
-//   try {
-//     await publicHolidaysStore.fetchAvailableCountries()
-//   } catch (error) {
-//     searchError.value = true
-//     console.error(error)
-//   }
-// })
-
+const lastCountrySearchedStore = useLastCountrySearchedStore()
 const { availableCountries } = storeToRefs(publicHolidaysStore)
 const filteredCountries = ref<Country[] | null>(null)
 const searchError = ref<boolean>(false)
 const searchKey = ref<string>('')
+const popupListRef = ref<InstanceType<typeof PopUpList> | null>(null)
 
 const fetchLocations = (searchQuery: string) => {
   searchKey.value = searchQuery
@@ -63,13 +61,27 @@ const fetchLocations = (searchQuery: string) => {
   })
 }
 
-const selectLocation = (location: Country) => {
-  console.log(location)
+const selectLocation = async (location: Country) => {
+  await lastCountrySearchedStore.setLastCountrySearched(location.countryCode)
+  closePopUpList()
 }
 
 const closePopUpList = () => {
   filteredCountries.value = null
   searchKey.value = ''
+}
+
+const handleArrowDown = () => {
+  console.log('handleArrowDown')
+  popupListRef.value?.moveDown()
+}
+
+const handleArrowUp = () => {
+  popupListRef.value?.moveUp()
+}
+
+const handleEnter = () => {
+  popupListRef.value?.selectCurrent()
 }
 </script>
 
