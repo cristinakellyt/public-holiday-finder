@@ -11,6 +11,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   const availableCountries = ref<Country[]>([])
   const publicHolidaysWorldwide = ref<PublicHoliday[]>([])
   const countryPublicHolidays = ref<PublicHoliday[]>([])
+  const isTodayPublicHoliday = ref<boolean>(false)
 
   const countryFlagStore = useCountryFlagStore()
   const wikipediaLinksStore = useWikipediaLinksStore()
@@ -68,6 +69,16 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     }
   }
 
+  const checkIfTodayIsHoliday = async (countryCode: string) => {
+    try {
+      const response = await fetch(`${API_URL}IsTodayPublicHoliday/${countryCode}`)
+      isTodayPublicHoliday.value = response.status === 200
+    } catch (error) {
+      console.error(error)
+      throw new Error('Error fetching if today is a public holiday')
+    }
+  }
+
   return {
     availableCountries,
     fetchAvailableCountries,
@@ -75,5 +86,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     fetchPublicHolidaysWorldwide,
     countryPublicHolidays,
     fetchPublicHolidaysByCountry,
+    isTodayPublicHoliday,
+    checkIfTodayIsHoliday,
   }
 })

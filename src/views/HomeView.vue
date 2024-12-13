@@ -7,10 +7,10 @@
         @onCountrySelected="onCountrySelected"
         :selected-country="lastCountrySearched.countryName"
       />
-      <TableHolidaysWorldwide />
       <LastSearchedCountrySection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
       />
+      <TableHolidaysWorldwide />
     </BaseWidth>
   </main>
 </template>
