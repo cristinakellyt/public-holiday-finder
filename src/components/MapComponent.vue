@@ -2354,7 +2354,7 @@
 
 <script setup lang="ts">
 //Vue
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, type PropType } from 'vue'
 
 const props = defineProps({
   clickableCountries: {
@@ -2373,7 +2373,7 @@ const props = defineProps({
     }),
   },
   selectedCountry: {
-    type: String,
+    type: String as PropType<string | null>,
     required: false,
     default: null,
   },
