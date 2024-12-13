@@ -96,6 +96,7 @@ defineProps({
 
 .row-base-table {
   vertical-align: middle;
+  height: pxToRem(60);
 
   .cell-base-table {
     background-color: $pure-white;

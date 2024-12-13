@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 //Vue
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 //Icons
 import icDoubleLeftArrow from '@/assets/icons/ic_double_left_arrow.svg'
 import icLeftArrow from '@/assets/icons/ic_left_arrow.svg'
@@ -71,6 +71,16 @@ function goToLastPage() {
   actualPage.value = totalPages.value
   emit('updateCurrentPage', actualPage.value)
 }
+
+// Watch props.currentPage, if it changes, update actualPage
+watch(
+  () => props.currentPage,
+  (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      actualPage.value = newValue
+    }
+  },
+)
 </script>
 
 <style scoped lang="scss">

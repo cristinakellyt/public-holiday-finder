@@ -12,13 +12,13 @@
     </h2>
     <!-- Content -->
     <div class="content-wrapper">
-      <!-- Holidays -->
-      <div class="content-left">
-        <LastSearchedCountryHolidayTable />
-      </div>
       <!-- Country Info -->
-      <div class="content-right">
+      <div class="content-left">
         <CountryInfo />
+      </div>
+      <!-- Holidays -->
+      <div class="content-right">
+        <LastSearchedCountryHolidayTable />
       </div>
     </div>
   </div>
@@ -64,7 +64,7 @@ const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
 .content-wrapper {
   @include flex-gap(row, pxToRem(50), flex-start, flex-start);
   width: 100%;
-  margin-top: pxToRem(20);
+  margin: pxToRem(20) 0 pxToRem(30) 0;
 
   :deep(.base-table-wrapper) {
     padding: 0;
@@ -75,7 +75,7 @@ const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
 
 .content-left {
   width: 50%;
-  height: pxToRem(500);
+  height: auto;
 }
 
 .content-right {

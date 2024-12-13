@@ -14,11 +14,11 @@
       </template>
       <!-- Date -->
       <template #date="{ rowData }">
-        {{ dateFormatter(rowData.date) }}
+        {{ rowData.date ? dateFormatter(rowData.date) : '' }}
       </template>
       <!-- Holiday Name -->
       <template #name="{ rowData }">
-        <div class="centralized-container" role="link">
+        <div class="centralized-container">
           <!-- If wikipedia link is not empty, we can click on the name and it will redirect to the wikipedia page -->
           <a
             v-if="rowData.wikipediaLink"
@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 //Vue
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 //Types
 import type { TableOptions } from '@/types/tableOptions'
@@ -85,7 +85,33 @@ const getPaginatedData = () => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = currentPage.value * pageSize.value
   tableData.value = lastCountrySearched.value.holidays.slice(startIndex, endIndex)
+  //Fill tableData with empty rows if the number of holidays is not a multiple of pageSize
+  const currentTableRows = tableData.value.length
+  const missingRows = pageSize.value - currentTableRows
+  for (let i = 0; i < missingRows; i++) {
+    //Create fake row
+    tableData.value.push({
+      date: '',
+      localName: '',
+      name: '',
+      countryCode: '',
+      global: false,
+      counties: [],
+      launchYear: 0,
+      types: [],
+    })
+  }
 }
+
+//if the lastCountrySearched changes, set currentPage to 1
+watch(
+  () => lastCountrySearched.value,
+  (newValue, oldValue) => {
+    if (newValue.countryName !== oldValue.countryName) {
+      updatePage(1)
+    }
+  },
+)
 
 onMounted(() => {
   getPaginatedData()
