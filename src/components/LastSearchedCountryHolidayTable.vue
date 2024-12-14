@@ -4,10 +4,10 @@
       <!-- Title -->
       <template #title>
         <h2 class="title">
-          Public Holidays in {{ lastCountrySearched.countryName }}
+          Public Holidays in {{ lastCountrySearched.name }}
           <img
-            v-if="lastCountrySearched.countryFlagUrl"
-            :src="lastCountrySearched.countryFlagUrl"
+            v-if="lastCountrySearched.flagUrl"
+            :src="lastCountrySearched.flagUrl"
             alt="country-flag"
           />
         </h2>
@@ -107,7 +107,7 @@ const getPaginatedData = () => {
 watch(
   () => lastCountrySearched.value,
   (newValue, oldValue) => {
-    if (newValue.countryName !== oldValue.countryName) {
+    if (newValue.name !== oldValue.name) {
       updatePage(1)
     }
   },

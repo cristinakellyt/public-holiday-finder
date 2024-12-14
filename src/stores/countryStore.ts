@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 // Types
-import type { Border, CountryInfo } from '@/types/country'
+import type { CountryInfo } from '@/types/country'
 // Stores
 import { useCountryFlagStore } from '@/stores/countryFlagStore'
 import { devLog } from '@/utils/logger'
@@ -28,7 +28,7 @@ export const useCountryStore = defineStore('country', () => {
     }
   }
 
-  const addFlagUrlToBorders = async (borders: Border[]) => {
+  const addFlagUrlToBorders = async (borders: CountryInfo[]) => {
     return await Promise.all(
       borders.map(async (border) => {
         return {

@@ -1,8 +1,8 @@
-import { defineStore, storeToRefs } from 'pinia'
+import { defineStore } from 'pinia'
 import { ref } from 'vue'
 //Types
 import type { PublicHoliday } from '@/types/publicHolidays'
-import type { LastCountrySearched } from '@/types/lastSearchedCountry'
+import type { LastCountrySearched } from '@/types/country'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
@@ -13,12 +13,10 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
   const wikipediaLinksStore = useWikipediaLinksStore()
   const countryFlagStore = useCountryFlagStore()
 
-  // const { availableCountries } = storeToRefs(publicHolidaysStore)
-
   const lastCountrySearched = ref<LastCountrySearched>({
     countryCode: '',
-    countryName: null,
-    countryFlagUrl: null,
+    name: null,
+    flagUrl: null,
     holidays: [],
   })
 
@@ -34,8 +32,8 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
 
     lastCountrySearched.value = {
       countryCode: countryCode,
-      countryName: await getCountryName(countryCode),
-      countryFlagUrl: await countryFlagStore.getCountryFlag(countryCode),
+      name: await getCountryName(countryCode),
+      flagUrl: await countryFlagStore.getCountryFlag(countryCode),
       holidays: await getHolidays(countryCode),
     }
     localStorage.setItem('lastCountrySearched', JSON.stringify(lastCountrySearched.value))

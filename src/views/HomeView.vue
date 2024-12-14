@@ -5,7 +5,7 @@
       <MapComponent
         :clickable-countries="getCountriesNames"
         @onCountrySelected="onCountrySelected"
-        :selected-country="lastCountrySearched.countryName"
+        :selected-country="lastCountrySearched.name"
       />
       <CountryDetailSection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"

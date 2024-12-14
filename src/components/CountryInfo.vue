@@ -114,9 +114,9 @@ const getTextForTodayIsHoliday = computed(() => {
     return 'Sorry, we are not able to check if today is a public holiday in this country'
 
   if (isTodayPublicHoliday.value) {
-    return `Today is a public holiday in ${lastCountrySearched.value.countryName}! It's ${lastCountrySearched.value.holidays[0].name}`
+    return `Today is a public holiday in ${lastCountrySearched.value.name}! It's ${lastCountrySearched.value.holidays[0].name}`
   } else {
-    return `Today is not a public holiday in ${lastCountrySearched.value.countryName}`
+    return `Today is not a public holiday in ${lastCountrySearched.value.name}`
   }
 })
 </script>

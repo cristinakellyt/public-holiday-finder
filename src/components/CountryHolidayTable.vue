@@ -11,10 +11,10 @@
           >
             Next
           </span>
-          Public Holidays in {{ lastCountrySearched.countryName }}
+          Public Holidays in {{ lastCountrySearched.name }}
           <img
-            v-if="lastCountrySearched.countryFlagUrl"
-            :src="lastCountrySearched.countryFlagUrl"
+            v-if="lastCountrySearched.flagUrl"
+            :src="lastCountrySearched.flagUrl"
             alt="country-flag"
           />
           <span v-if="countryHolidaysByYear && filterYear?.toString().length === 4">
@@ -114,10 +114,12 @@ const lastCountrySearchedStore = useLastCountrySearchedStore()
 const publicHolidaysStore = usePublicHolidaysStore()
 
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
-const countrySearchedCopy = ref(lastCountrySearched.value)
+const countryHolidaySearchedCopy = ref(
+  JSON.parse(JSON.stringify(lastCountrySearched.value.holidays)),
+)
 const countryHolidaysByYear = ref<PublicHoliday[] | null>(null)
 
-const tableData = ref(lastCountrySearched.value.holidays)
+const tableData = ref<PublicHoliday[]>([])
 
 const filterYear = ref<number | null>(null)
 const filterYearHasError = ref(false)
@@ -144,11 +146,13 @@ const handleSort = (column: string) => {
   } else {
     // If clicking a new column, set it as current and default to ascending
     currentSortColumn.value = column
-    sortDirection.value = 'asc'
+    sortDirection.value = 'desc'
   }
 
+  console.log(sortDirection.value, 'sortDirection')
+
   // Sort the holidays array
-  countrySearchedCopy.value.holidays.sort((a: PublicHoliday, b: PublicHoliday) => {
+  tableData.value.sort((a: PublicHoliday, b: PublicHoliday) => {
     // Handle null/undefined values by pushing them to the end
     if (!a[column as keyof PublicHoliday]) return 1
     if (!b[column as keyof PublicHoliday]) return -1
@@ -170,7 +174,6 @@ const handleSort = (column: string) => {
       )
     )
   })
-  updatePage(1)
 }
 
 const updatePage = (page: number) => {
@@ -183,7 +186,7 @@ const getPaginatedData = () => {
   const endIndex = currentPage.value * pageSize.value
 
   if (countryHolidaysByYear.value === null || filterYearHasError.value) {
-    tableData.value = countrySearchedCopy.value.holidays.slice(startIndex, endIndex)
+    tableData.value = countryHolidaySearchedCopy.value.slice(startIndex, endIndex)
   } else {
     tableData.value = countryHolidaysByYear.value.slice(startIndex, endIndex)
   }
@@ -210,9 +213,11 @@ const getPaginatedData = () => {
 watch(
   () => lastCountrySearched.value,
   (newValue, oldValue) => {
-    if (newValue.countryName !== oldValue.countryName) {
+    if (newValue.name !== oldValue.name) {
       filterYear.value = null
-      countrySearchedCopy.value = JSON.parse(JSON.stringify(lastCountrySearched.value))
+      countryHolidaySearchedCopy.value = JSON.parse(
+        JSON.stringify(lastCountrySearched.value.holidays),
+      )
       updatePage(1)
     }
   },
@@ -231,7 +236,6 @@ const handleFilterYear = async (inputValue: string) => {
   if (filterYear.value.toString().length > 4) {
     countryHolidaysByYear.value = null
     filterYearHasError.value = true
-
     updatePage(1)
     return
   }

@@ -3,10 +3,10 @@
     <!-- Title -->
     <h2 class="section-title">
       Check out the information of the last searched country:
-      <span class="country-name">{{ lastCountrySearched.countryName }}</span>
+      <span class="country-name">{{ lastCountrySearched.name }}</span>
       <img
-        v-if="lastCountrySearched.countryFlagUrl"
-        :src="lastCountrySearched.countryFlagUrl"
+        v-if="lastCountrySearched.flagUrl"
+        :src="lastCountrySearched.flagUrl"
         alt="country-flag"
       />
     </h2>
