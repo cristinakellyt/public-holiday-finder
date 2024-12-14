@@ -15,8 +15,8 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
 
   const lastCountrySearched = ref<LastCountrySearched>({
     countryCode: '',
-    name: null,
-    flagUrl: null,
+    name: '',
+    flagUrl: '',
     holidays: [],
   })
 
@@ -43,7 +43,7 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
     const countries = await publicHolidaysStore.getAvailableCountries()
 
     const countryName = countries.find((country) => country.countryCode === countryCode)?.name
-    return countryName ? countryName : null
+    return countryName ? countryName : ''
   }
 
   const getHolidays = async (countryCode: string) => {

@@ -10,9 +10,6 @@
       <CountryDetailSection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
       />
-      <!-- <LastSearchedCountrySection
-        v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
-      /> -->
       <TableHolidaysWorldwide />
     </BaseWidth>
   </main>
@@ -25,7 +22,6 @@ import { computed } from 'vue'
 //Components
 import SearchCountry from '@/components/SearchCountry.vue'
 import TableHolidaysWorldwide from '@/components/TableHolidaysWorldwide.vue'
-// import LastSearchedCountrySection from '@/components/LastSearchedCountrySection.vue'
 import MapComponent from '@/components/MapComponent.vue'
 import CountryDetailSection from '@/components/CountryDetailSection .vue'
 //Stores

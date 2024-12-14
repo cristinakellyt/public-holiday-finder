@@ -2381,7 +2381,7 @@ const props = defineProps({
 
 const emit = defineEmits(['onCountrySelected'])
 
-const currentlySelected = ref<string | null>()
+const currentlySelected = ref<string | null>(props.selectedCountry)
 const tooltip = ref<HTMLElement>()
 
 //watch selectedCountry
@@ -2494,7 +2494,17 @@ const updateTooltipPosition = (e: MouseEvent) => {
   }
 }
 
-onMounted(setupMapInteractions)
+onMounted(() => {
+  setupMapInteractions()
+
+  // Initialize currentSelected if there's a selectedCountry prop
+  if (props.selectedCountry) {
+    currentlySelected.value = props.selectedCountry
+    getAllPathsForCountry(props.selectedCountry).forEach((path) => {
+      path.style.fill = props.colors.selected
+    })
+  }
+})
 </script>
 
 <style scoped lang="scss">

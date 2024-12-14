@@ -149,8 +149,6 @@ const handleSort = (column: string) => {
     sortDirection.value = 'desc'
   }
 
-  console.log(sortDirection.value, 'sortDirection')
-
   // Sort the holidays array
   tableData.value.sort((a: PublicHoliday, b: PublicHoliday) => {
     // Handle null/undefined values by pushing them to the end
@@ -218,6 +216,8 @@ watch(
       countryHolidaySearchedCopy.value = JSON.parse(
         JSON.stringify(lastCountrySearched.value.holidays),
       )
+      // reset holidays by year
+      countryHolidaysByYear.value = null
       updatePage(1)
     }
   },

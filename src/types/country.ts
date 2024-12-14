@@ -2,7 +2,7 @@ import type { PublicHoliday } from '@/types/publicHolidays'
 
 type Country = {
   countryCode: string
-  name: string | null
+  name: string
   flagUrl?: string | null
 }
 
@@ -10,6 +10,7 @@ type CountryInfo = Country & {
   commonName: string
   officialName: string
   region: string
+  isHolidayToday: boolean
   borders: CountryInfo[]
 }
 

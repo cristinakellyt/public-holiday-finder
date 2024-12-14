@@ -66,25 +66,20 @@ import icFavoriteEmpty from '@/assets/icons/ic_favorite_empty.svg'
 import icFavoriteFullGreen from '@/assets/icons/ic_favorite_full_green.svg'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
-const countryStore = useCountryStore()
+// const countryStore = useCountryStore()
 const publicHolidaysStore = usePublicHolidaysStore()
 
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
-const { countryInfo } = storeToRefs(countryStore)
-const { availableCountries } = storeToRefs(publicHolidaysStore)
+const { availableCountries, countryInfo } = storeToRefs(publicHolidaysStore)
 const isCountryFavorite = ref(false)
-const isTodayPublicHoliday = ref<boolean | null>(null)
 
 onMounted(async () => {
-  await countryStore.getCountryInfo(lastCountrySearched.value.countryCode)
-  isTodayPublicHoliday.value = await publicHolidaysStore.isTodayPublicHoliday(
-    lastCountrySearched.value.countryCode,
-  )
+  await publicHolidaysStore.getCountryInfo(lastCountrySearched.value.countryCode)
 })
 
 //watch lastCountrySearched
 watch(lastCountrySearched, async () => {
-  await countryStore.getCountryInfo(lastCountrySearched.value.countryCode)
+  await publicHolidaysStore.getCountryInfo(lastCountrySearched.value.countryCode)
 })
 
 const selectCountry = async (countryCode: string) => {
@@ -110,10 +105,10 @@ const getTextForBorders = computed(() => {
 })
 
 const getTextForTodayIsHoliday = computed(() => {
-  if (isTodayPublicHoliday.value === null)
+  if (countryInfo.value?.isHolidayToday === null)
     return 'Sorry, we are not able to check if today is a public holiday in this country'
 
-  if (isTodayPublicHoliday.value) {
+  if (countryInfo.value?.isHolidayToday) {
     return `Today is a public holiday in ${lastCountrySearched.value.name}! It's ${lastCountrySearched.value.holidays[0].name}`
   } else {
     return `Today is not a public holiday in ${lastCountrySearched.value.name}`
