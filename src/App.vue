@@ -22,7 +22,7 @@ const countryFlagStore = useCountryFlagStore()
 onMounted(async () => {
   try {
     // Fetch available countries
-    await publicHolidaysStore.fetchAvailableCountries()
+    await publicHolidaysStore.getAvailableCountries()
     // Load stored states from Local Storage and preload them in the state management
     lastCountrySearchedStore.loadLastCountrySearched()
     wikipediaLinksStore.loadWikipediaLinks()

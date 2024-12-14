@@ -183,10 +183,8 @@ const getPaginatedData = () => {
   const endIndex = currentPage.value * pageSize.value
 
   if (countryHolidaysByYear.value === null || filterYearHasError.value) {
-    console.log('all holidays')
     tableData.value = countrySearchedCopy.value.holidays.slice(startIndex, endIndex)
   } else {
-    console.log('holidays by year')
     tableData.value = countryHolidaysByYear.value.slice(startIndex, endIndex)
   }
 
@@ -213,7 +211,6 @@ watch(
   () => lastCountrySearched.value,
   (newValue, oldValue) => {
     if (newValue.countryName !== oldValue.countryName) {
-      console.log(lastCountrySearched, 'las')
       filterYear.value = null
       countrySearchedCopy.value = JSON.parse(JSON.stringify(lastCountrySearched.value))
       updatePage(1)
@@ -261,10 +258,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-// .last-searched-country-wrapper {
-// max-width: pxToRem(800);
-// }
-
 .title {
   @include flex-gap(row, pxToRem(10), center, center);
   font-size: pxToRem(22);

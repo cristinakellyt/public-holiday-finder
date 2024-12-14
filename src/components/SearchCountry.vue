@@ -72,7 +72,6 @@ const closePopUpList = () => {
 }
 
 const handleArrowDown = () => {
-  console.log('handleArrowDown')
   popupListRef.value?.moveDown()
 }
 

@@ -1,6 +1,10 @@
 <template>
   <div class="table-holidays-worldwide">
-    <BaseTable v-if="tableData.length > 0" :options="tableOptions" :table-data="tableData">
+    <BaseTable
+      v-if="tablePaginatedData.length > 0"
+      :options="tableOptions"
+      :table-data="tablePaginatedData"
+    >
       <!-- Title -->
       <template #title>
         <h2 class="title">Public Holidays Worldwide</h2>
@@ -52,13 +56,14 @@
 <script setup lang="ts">
 //Vue
 import { onMounted, ref } from 'vue'
-import { storeToRefs } from 'pinia'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Utils
 import dateFormatter from '@/utils/dateFormatter'
 //Icons
 import icRedirectLink from '@/assets/icons/ic_redirect_link.svg'
+//Types
+import type { PublicHoliday } from '@/types/publicHolidays'
 
 const publicHolidaysStore = usePublicHolidaysStore()
 
@@ -70,19 +75,15 @@ const tableOptions = {
   },
 }
 
-const { publicHolidaysWorldwide } = storeToRefs(publicHolidaysStore)
-const tableData = ref(publicHolidaysWorldwide.value)
+let tableData: PublicHoliday[] = []
+const tablePaginatedData = ref<PublicHoliday[]>([])
 const currentPage = ref(1)
 const pageSize = ref(5)
 
 //Fetch public holidays worldwide and fill data with flags and country name to display in table
 onMounted(async () => {
-  try {
-    await publicHolidaysStore.fetchPublicHolidaysWorldwide()
-    getPaginatedData()
-  } catch (error) {
-    console.error(error)
-  }
+  tableData = await publicHolidaysStore.getPublicHolidaysWorldwide()
+  getPaginatedData()
 })
 
 function updatePage(page: number) {
@@ -93,7 +94,8 @@ function updatePage(page: number) {
 function getPaginatedData() {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = startIndex + pageSize.value
-  tableData.value = publicHolidaysWorldwide.value.slice(startIndex, endIndex)
+  tablePaginatedData.value = tableData.slice(startIndex, endIndex)
+  // TODO: add empty rows in BaseTable
 }
 </script>
 

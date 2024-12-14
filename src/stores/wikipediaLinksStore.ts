@@ -1,15 +1,21 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { devLog } from '@/utils/logger'
 
 type WikipediaLinks = {
   [key: string]: string
+}
+
+const CONFIG = {
+  STORAGE_KEY: 'wikipediaLinks',
+  API_BASE_URL: 'https://en.wikipedia.org/w/api.php',
 }
 
 export const useWikipediaLinksStore = defineStore('wikipediaLinks', () => {
   const wikipediaLinks = ref<WikipediaLinks>({})
 
   const loadWikipediaLinks = () => {
-    const wikipediaLinksStored = localStorage.getItem('wikipediaLinks')
+    const wikipediaLinksStored = localStorage.getItem(CONFIG.STORAGE_KEY)
     if (wikipediaLinksStored) {
       wikipediaLinks.value = JSON.parse(wikipediaLinksStored)
     }
@@ -21,7 +27,6 @@ export const useWikipediaLinksStore = defineStore('wikipediaLinks', () => {
     // if the is no 'holiday' string in the holiday name, we search we concact hollidayName
     // with 'holiday' string
     const searchQuery = holidayName.includes('holiday') ? holidayName : holidayName + ' holiday'
-    const baseUrl = 'https://en.wikipedia.org/w/api.php'
     const params = new URLSearchParams({
       action: 'query',
       list: 'search',
@@ -30,25 +35,25 @@ export const useWikipediaLinksStore = defineStore('wikipediaLinks', () => {
       origin: '*',
     })
 
-    const url = `${baseUrl}?${params.toString()}`
-
     try {
-      const response = await fetch(url)
+      const response = await fetch(`${CONFIG.API_BASE_URL}?${params.toString()}`)
+      if (!response.ok) return null
+
       const data = await response.json()
 
       // Get the first search result
-      const firstResult = data.query.search[0]
+      const firstResult = data.query?.search[0]
       if (firstResult) {
         const wikiUrl = `https://en.wikipedia.org/wiki/${firstResult.title.replace(/ /g, '_')}`
         wikipediaLinks.value[holidayName] = wikiUrl
-        localStorage.setItem('wikipediaLinks', JSON.stringify(wikipediaLinks.value))
+        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(wikipediaLinks.value))
         return wikiUrl
       } else {
-        console.warn('No search results found for:', holidayName)
+        devLog('No search results found for:', holidayName)
         return null
       }
     } catch (error) {
-      console.error('Error fetching Wikipedia link:', error)
+      devLog('Error fetching Wikipedia link:', error)
       return null
     }
   }
@@ -63,5 +68,5 @@ export const useWikipediaLinksStore = defineStore('wikipediaLinks', () => {
     }
   }
 
-  return { wikipediaLinks, getWikipediaLink, loadWikipediaLinks }
+  return { getWikipediaLink, loadWikipediaLinks }
 })

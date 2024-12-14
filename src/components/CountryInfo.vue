@@ -1,5 +1,5 @@
 <template>
-  <div class="country-info-wrapper">
+  <div class="country-info-wrapper" v-if="countryInfo">
     <!-- TODO: add favorite feature and fix the icons -->
     <img
       class="favorite-icon"
@@ -71,17 +71,20 @@ const publicHolidaysStore = usePublicHolidaysStore()
 
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
 const { countryInfo } = storeToRefs(countryStore)
-const { availableCountries, isTodayPublicHoliday } = storeToRefs(publicHolidaysStore)
+const { availableCountries } = storeToRefs(publicHolidaysStore)
 const isCountryFavorite = ref(false)
+const isTodayPublicHoliday = ref<boolean | null>(null)
 
 onMounted(async () => {
-  await countryStore.fetchCountryInfo(lastCountrySearched.value.countryCode)
-  await publicHolidaysStore.checkIfTodayIsHoliday(lastCountrySearched.value.countryCode)
+  await countryStore.getCountryInfo(lastCountrySearched.value.countryCode)
+  isTodayPublicHoliday.value = await publicHolidaysStore.isTodayPublicHoliday(
+    lastCountrySearched.value.countryCode,
+  )
 })
 
 //watch lastCountrySearched
 watch(lastCountrySearched, async () => {
-  await countryStore.fetchCountryInfo(lastCountrySearched.value.countryCode)
+  await countryStore.getCountryInfo(lastCountrySearched.value.countryCode)
 })
 
 const selectCountry = async (countryCode: string) => {
@@ -102,10 +105,14 @@ const favoriteCountry = () => {
 }
 
 const getTextForBorders = computed(() => {
+  if (countryInfo.value === null) return 'Error fetching country info'
   return countryInfo.value.borders.length > 0 ? 'borders with: ' : 'no borders'
 })
 
 const getTextForTodayIsHoliday = computed(() => {
+  if (isTodayPublicHoliday.value === null)
+    return 'Sorry, we are not able to check if today is a public holiday in this country'
+
   if (isTodayPublicHoliday.value) {
     return `Today is a public holiday in ${lastCountrySearched.value.countryName}! It's ${lastCountrySearched.value.holidays[0].name}`
   } else {

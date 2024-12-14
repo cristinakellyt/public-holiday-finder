@@ -4,29 +4,27 @@ import { ref } from 'vue'
 import type { Border, CountryInfo } from '@/types/country'
 // Stores
 import { useCountryFlagStore } from '@/stores/countryFlagStore'
+import { devLog } from '@/utils/logger'
 
-const API_URL = 'https://date.nager.at/api/v3/'
+const CONFIG = {
+  API_URL: 'https://date.nager.at/api/v3/',
+}
 
 export const useCountryStore = defineStore('country', () => {
   const countryFlagStore = useCountryFlagStore()
 
-  const countryInfo = ref<CountryInfo>({
-    commonName: '',
-    officialName: '',
-    countryCode: '',
-    region: '',
-    borders: [],
-  })
+  const countryInfo = ref<CountryInfo | null>(null)
 
-  const fetchCountryInfo = async (countryCode: string) => {
+  const getCountryInfo = async (countryCode: string) => {
     try {
-      const response = await fetch(`${API_URL}CountryInfo/${countryCode}`)
+      const response = await fetch(`${CONFIG.API_URL}CountryInfo/${countryCode}`)
+      if (!response.ok) return null
       const data = await response.json()
       data.borders = await addFlagUrlToBorders(data.borders)
       countryInfo.value = data
     } catch (error) {
-      console.error(error)
-      throw new Error('Error fetching country info')
+      devLog('Error fetching country info:', error)
+      return null
     }
   }
 
@@ -42,7 +40,7 @@ export const useCountryStore = defineStore('country', () => {
   }
 
   return {
-    fetchCountryInfo,
+    getCountryInfo,
     countryInfo,
     addFlagUrlToBorders,
   }
