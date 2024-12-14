@@ -15,33 +15,37 @@
       alt="favorite"
       @click="favoriteCountry"
     />
-    <!-- Map -->
-    <CountryMap class="map-wrapper" :country-code="lastCountrySearched.countryCode" />
-    <!-- Country Info -->
-    <div class="info-text">
-      <span class="bold">Official Name: </span>
-      <span class="country-info-official-name">{{ countryInfo.officialName }}</span>
-    </div>
-    <p class="bold info-text">
-      {{ getTextForTodayIsHoliday }}
-    </p>
-    <div class="info-text">
-      <span class="bold">Region: </span>
-      <span class="country-info-region">{{ countryInfo.region }}</span>
-    </div>
-    <div class="info-text">
-      <span class="bold">This country has {{ getTextForBorders }}</span>
-      <!-- Show only if there are borders -->
-      <div class="border-info-wrapper" v-if="countryInfo.borders.length > 0">
-        <span
-          class="border-names"
-          :class="{ unavailable: isBorderUnavailable(border.countryCode) }"
-          v-for="(border, index) in countryInfo.borders"
-          :key="index"
-          @click="selectCountry(border.countryCode)"
-        >
-          <img :src="border.flagUrl" alt="border-flag" />{{ border.commonName }}
-        </span>
+    <div class="content-wrapper">
+      <!-- Map -->
+      <CountryMap class="map-wrapper" :country-code="lastCountrySearched.countryCode" />
+      <div class="content-info">
+        <!-- Country Info -->
+        <div class="info-text">
+          <span class="bold">Official Name: </span>
+          <span class="country-info-official-name">{{ countryInfo.officialName }}</span>
+        </div>
+        <p class="bold info-text">
+          {{ getTextForTodayIsHoliday }}
+        </p>
+        <div class="info-text">
+          <span class="bold">Region: </span>
+          <span class="country-info-region">{{ countryInfo.region }}</span>
+        </div>
+        <div class="info-text">
+          <span class="bold">This country has {{ getTextForBorders }}</span>
+          <!-- Show only if there are borders -->
+          <div class="border-info-wrapper" v-if="countryInfo.borders.length > 0">
+            <span
+              class="border-names"
+              :class="{ unavailable: isBorderUnavailable(border.countryCode) }"
+              v-for="(border, index) in countryInfo.borders"
+              :key="index"
+              @click="selectCountry(border.countryCode)"
+            >
+              <img :src="border.flagUrl" alt="border-flag" />{{ border.commonName }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -123,6 +127,18 @@ const getTextForTodayIsHoliday = computed(() => {
   .map-wrapper {
     width: 100%;
     height: pxToRem(300);
+  }
+
+  .content-wrapper {
+    @include flex-gap(row, pxToRem(10), flex-start, flex-start);
+    width: 100%;
+    height: auto;
+  }
+
+  .content-info {
+    @include flex-gap(column, pxToRem(10), flex-start, flex-start);
+    width: 100%;
+    height: auto;
   }
 }
 

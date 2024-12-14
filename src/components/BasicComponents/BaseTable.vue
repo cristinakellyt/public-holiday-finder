@@ -12,7 +12,14 @@
             :key="index"
             class="cell-base-table"
           >
-            {{ value }}
+            <div
+              class="header-content"
+              :class="{ sortable: options.sortable?.includes(keyName) }"
+              @click="options.sortable?.includes(keyName) && emitSort(keyName)"
+            >
+              {{ value }}
+              <slot name="sort-icon" :column="keyName" />
+            </div>
           </td>
         </tr>
       </thead>
@@ -43,6 +50,12 @@ defineProps({
     required: true,
   },
 })
+
+const emit = defineEmits(['sort'])
+
+const emitSort = (column: string) => {
+  emit('sort', column)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -112,5 +125,19 @@ defineProps({
       padding-right: pxToRem(32);
     }
   }
+}
+
+.sortable {
+  cursor: pointer;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: pxToRem(8);
+}
+
+.sort-icon {
+  font-size: pxToRem(14);
 }
 </style>
