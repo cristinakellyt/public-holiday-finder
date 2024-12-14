@@ -116,8 +116,8 @@ const getTextForTodayIsHoliday = computed(() => {
 
 <style scoped lang="scss">
 .country-info-wrapper {
-  width: 80%;
-  margin: 0 auto;
+  //   width: 80%;
+  //   margin: 0 auto;
   @include flex-gap(column, pxToRem(10), flex-start, flex-start);
   background-color: $green-1;
   padding: pxToRem(10);
@@ -130,7 +130,7 @@ const getTextForTodayIsHoliday = computed(() => {
   }
 
   .content-wrapper {
-    @include flex-gap(row, pxToRem(10), flex-start, flex-start);
+    @include flex-gap(row, pxToRem(10), flex-start, space-between);
     width: 100%;
     height: auto;
   }

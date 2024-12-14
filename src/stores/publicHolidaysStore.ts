@@ -79,6 +79,28 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     }
   }
 
+  const fetchPublicHolidaysByYear = async (year: number, countryCode: string) => {
+    try {
+      const response = await fetch(`${API_URL}PublicHolidays/${year}/${countryCode}`)
+      if (response.status !== 200) {
+        throw new Error()
+      }
+      const data = await response.json()
+      return data
+    } catch (error) {
+      throw new Error('Error fetching public holidays by year')
+    }
+  }
+
+  const getPublicHolidaysByYear = async (year: number, countryCode: string) => {
+    try {
+      const data = await fetchPublicHolidaysByYear(year, countryCode)
+      return data
+    } catch (error) {
+      return null
+    }
+  }
+
   return {
     availableCountries,
     fetchAvailableCountries,
@@ -88,5 +110,6 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     fetchPublicHolidaysByCountry,
     isTodayPublicHoliday,
     checkIfTodayIsHoliday,
+    getPublicHolidaysByYear,
   }
 })
