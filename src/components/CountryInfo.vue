@@ -42,7 +42,9 @@
               :key="index"
               @click="selectCountry(border.countryCode)"
             >
-              <img :src="border.flagUrl" alt="border-flag" />{{ border.commonName }}
+              <img v-if="border.flagUrl" :src="border.flagUrl" alt="border-flag" />{{
+                border.commonName
+              }}
             </span>
           </div>
         </div>
@@ -58,28 +60,33 @@ import { storeToRefs } from 'pinia'
 //Components
 import CountryMap from '@/components/CountryMap.vue'
 //Stores
-import { useCountryStore } from '@/stores/countryStore'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Icons
 import icFavoriteEmpty from '@/assets/icons/ic_favorite_empty.svg'
 import icFavoriteFullGreen from '@/assets/icons/ic_favorite_full_green.svg'
+//Types
+import type { CountryInfo } from '@/types/country'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
-// const countryStore = useCountryStore()
 const publicHolidaysStore = usePublicHolidaysStore()
 
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
-const { availableCountries, countryInfo } = storeToRefs(publicHolidaysStore)
+const { availableCountries } = storeToRefs(publicHolidaysStore)
 const isCountryFavorite = ref(false)
+const countryInfo = ref<CountryInfo | null>(null)
 
 onMounted(async () => {
-  await publicHolidaysStore.getCountryInfo(lastCountrySearched.value.countryCode)
+  countryInfo.value = await publicHolidaysStore.getCountryInfo(
+    lastCountrySearched.value.countryCode,
+  )
 })
 
 //watch lastCountrySearched
 watch(lastCountrySearched, async () => {
-  await publicHolidaysStore.getCountryInfo(lastCountrySearched.value.countryCode)
+  countryInfo.value = await publicHolidaysStore.getCountryInfo(
+    lastCountrySearched.value.countryCode,
+  )
 })
 
 const selectCountry = async (countryCode: string) => {

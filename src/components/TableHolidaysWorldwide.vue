@@ -1,10 +1,6 @@
 <template>
-  <div class="table-holidays-worldwide">
-    <BaseTable
-      v-if="tablePaginatedData.length > 0"
-      :options="tableOptions"
-      :table-data="tablePaginatedData"
-    >
+  <div class="table-holidays-worldwide" v-if="tableData !== null">
+    <BaseTable :options="tableOptions" :table-data="tablePaginatedData">
       <!-- Title -->
       <template #title>
         <h2 class="title">Public Holidays Worldwide</h2>
@@ -75,26 +71,26 @@ const tableOptions = {
   },
 }
 
-let tableData: PublicHoliday[] = []
+const tableData = ref<PublicHoliday[] | null>(null)
 const tablePaginatedData = ref<PublicHoliday[]>([])
 const currentPage = ref(1)
 const pageSize = ref(5)
 
 //Fetch public holidays worldwide and fill data with flags and country name to display in table
 onMounted(async () => {
-  tableData = await publicHolidaysStore.getPublicHolidaysWorldwide()
+  tableData.value = await publicHolidaysStore.getPublicHolidaysWorldwide()
   getPaginatedData()
 })
 
-function updatePage(page: number) {
+const updatePage = (page: number) => {
   currentPage.value = page
   getPaginatedData()
 }
 
-function getPaginatedData() {
+const getPaginatedData = () => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = startIndex + pageSize.value
-  tablePaginatedData.value = tableData.slice(startIndex, endIndex)
+  tablePaginatedData.value = tableData.value?.slice(startIndex, endIndex) ?? []
   // TODO: add empty rows in BaseTable
 }
 </script>

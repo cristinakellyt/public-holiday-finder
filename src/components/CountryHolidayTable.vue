@@ -6,7 +6,8 @@
         <h2 class="title">
           <span
             v-if="
-              (!countryHolidaysByYear && filterYear?.toString().length !== 4) || filterYearHasError
+              (!countryHolidaysByYear && filterYear?.toString().length !== 4) ||
+              fetchHolidayByYearError
             "
           >
             Next
@@ -76,7 +77,7 @@
           placeholder="Filter by year"
           type="number"
           field-name="filterYear"
-          :text-error="filterYearHasError ? `Year ${filterYear} is out of range` : null"
+          :text-error="fetchHolidayByYearError ? `Year ${filterYear} is out of range` : null"
           label-text="Filter by year:"
         />
       </div>
@@ -122,7 +123,7 @@ const countryHolidaysByYear = ref<PublicHoliday[] | null>(null)
 const tableData = ref<PublicHoliday[]>([])
 
 const filterYear = ref<number | null>(null)
-const filterYearHasError = ref(false)
+const fetchHolidayByYearError = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(5)
 
@@ -183,7 +184,7 @@ const getPaginatedData = () => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = currentPage.value * pageSize.value
 
-  if (countryHolidaysByYear.value === null || filterYearHasError.value) {
+  if (countryHolidaysByYear.value === null || fetchHolidayByYearError.value) {
     tableData.value = countryHolidaySearchedCopy.value.slice(startIndex, endIndex)
   } else {
     tableData.value = countryHolidaysByYear.value.slice(startIndex, endIndex)
@@ -225,7 +226,7 @@ watch(
 
 const handleFilterYear = async (inputValue: string) => {
   filterYear.value = Number(inputValue)
-  filterYearHasError.value = false
+  fetchHolidayByYearError.value = false
 
   if (!filterYear.value) {
     countryHolidaysByYear.value = null
@@ -235,7 +236,7 @@ const handleFilterYear = async (inputValue: string) => {
 
   if (filterYear.value.toString().length > 4) {
     countryHolidaysByYear.value = null
-    filterYearHasError.value = true
+    fetchHolidayByYearError.value = true
     updatePage(1)
     return
   }
@@ -248,9 +249,9 @@ const handleFilterYear = async (inputValue: string) => {
     )
 
     if (countryHolidaysByYear.value !== null) {
-      filterYearHasError.value = false
+      fetchHolidayByYearError.value = false
     } else {
-      filterYearHasError.value = true
+      fetchHolidayByYearError.value = true
     }
     updatePage(1)
   }

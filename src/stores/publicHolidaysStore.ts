@@ -18,7 +18,6 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   const countryHolidaysMap = ref<{ [key: string]: PublicHoliday[] }>({})
   const isPublicHolidayTodayMap = ref<{ [key: string]: boolean }>({})
   const publicHolidaysByYearMap = ref<{ [key: string]: PublicHoliday[] }>({})
-  const countryInfo = ref<CountryInfo | null>(null)
   const countryInfoMap = ref<{ [key: string]: CountryInfo }>({})
 
   const countryFlagStore = useCountryFlagStore()
@@ -31,9 +30,9 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     try {
       const response = await fetch(`${CONFIG.API_URL}AvailableCountries`)
       if (!response.ok) return []
-      const data = await response.json()
+      const data = (await response.json()) as Country[]
       availableCountries.value = data
-      return availableCountries.value
+      return data
     } catch (error) {
       devLog('Error fetching available countries:', error)
       return []
@@ -46,7 +45,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
 
     try {
       const response = await fetch(`${CONFIG.API_URL}NextPublicHolidaysWorldwide`)
-      if (!response.ok) return []
+      if (!response.ok) return null
 
       const data = (await response.json()) as PublicHoliday[]
       // Add Flags
@@ -74,7 +73,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       return structuredClone(data)
     } catch (error) {
       devLog('Error fetching public holidays:', error)
-      return []
+      return null
     }
   }
 
@@ -86,14 +85,14 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
 
     try {
       const response = await fetch(`${CONFIG.API_URL}NextPublicHolidays/${countryCode}`)
-      if (!response.ok) return []
+      if (!response.ok) return null
 
       const data = (await response.json()) as PublicHoliday[]
       countryHolidaysMap.value[countryCode] = data
       return structuredClone(data)
     } catch (error) {
       devLog('Error fetching public holidays by country:', error)
-      return []
+      return null
     }
   }
 
@@ -144,8 +143,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
 
   const getCountryInfo = async (countryCode: string) => {
     if (countryCode in countryInfoMap.value) {
-      countryInfo.value = countryInfoMap.value[countryCode]
-      return
+      return countryInfoMap.value[countryCode]
     }
 
     try {
@@ -162,8 +160,8 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
         }),
       )
       data.isHolidayToday = await isTodayPublicHoliday(countryCode)
-      countryInfo.value = data
       countryInfoMap.value[countryCode] = data
+      return structuredClone(data)
     } catch (error) {
       devLog('Error fetching country info:', error)
       return null
@@ -172,7 +170,6 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
 
   return {
     availableCountries,
-    countryInfo,
     getAvailableCountries,
     getPublicHolidaysWorldwide,
     getPublicHolidaysByCountry,
