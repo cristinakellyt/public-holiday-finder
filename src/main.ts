@@ -12,6 +12,7 @@ import BasePagination from '@/components/BasicComponents/BasePagination.vue'
 import BaseInput from '@/components/BasicComponents/BaseInput.vue'
 import BaseSpinner from '@/components/BasicComponents/BaseSpinner.vue'
 import BaseButton from '@/components/BasicComponents/BaseButton.vue'
+import BaseModal from '@/components/BasicComponents/BaseModal.vue'
 
 const app = createApp(App)
 
@@ -21,6 +22,8 @@ app.component('BasePagination', BasePagination)
 app.component('BaseInput', BaseInput)
 app.component('BaseSpinner', BaseSpinner)
 app.component('BaseButton', BaseButton)
+app.component('BaseModal', BaseModal)
+
 app.use(createPinia())
 app.use(router)
 

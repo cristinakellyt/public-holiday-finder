@@ -74,7 +74,6 @@ const isCountryFavorite = ref(props.countryDetails.isFavorite)
 watch(
   () => props.countryDetails.isFavorite,
   (newValue) => {
-    console.log('newValue for isFavorite', newValue)
     isCountryFavorite.value = newValue
   },
 )
@@ -110,13 +109,10 @@ const isBorderUnavailable = (countryCode: string) => {
 }
 
 const toggleFavoriteCountry = () => {
-  // props.countryDetails.isFavorite = !props.countryDetails.isFavorite
   if (isCountryFavorite.value) {
     emit('onSaved', false, props.countryDetails.countryCode)
-    //   favoritesCountriesStore.addFavoriteCountry(props.countryDetails.countryCode)
   } else {
     emit('onSaved', true, props.countryDetails.countryCode)
-    //   favoritesCountriesStore.removeFavoriteCountry(props.countryDetails.countryCode)
   }
 }
 
