@@ -13,6 +13,7 @@ import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
 import { useCountryFlagStore } from '@/stores/countryFlagStore'
+import { devLog } from '@/utils/logger'
 
 const publicHolidaysStore = usePublicHolidaysStore()
 const lastCountrySearchedStore = useLastCountrySearchedStore()
@@ -28,7 +29,7 @@ onMounted(async () => {
     wikipediaLinksStore.loadWikipediaLinks()
     countryFlagStore.loadCountryFlag()
   } catch (error) {
-    console.error(error)
+    devLog("Error at start-up: ", error)
   }
 })
 </script>
