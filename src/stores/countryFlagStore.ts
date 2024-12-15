@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { devLog } from '@/utils/logger'
 
 const CONFIG = {
   STORAGE_KEY: 'countryFlag',
@@ -30,6 +31,7 @@ export const useCountryFlagStore = defineStore('countryFlag', () => {
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(countriesFlagObj.value))
       return flagUrl
     } catch (error) {
+      devLog("Error while fetching country flag: ", error)
       return null
     }
   }

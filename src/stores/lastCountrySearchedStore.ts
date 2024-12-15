@@ -9,10 +9,12 @@ import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
 import { useCountryFlagStore } from '@/stores/countryFlagStore'
 
 export const useLastCountrySearchedStore = defineStore('lastCountrySearched', () => {
+  // Setup Stores
   const publicHolidaysStore = usePublicHolidaysStore()
   const wikipediaLinksStore = useWikipediaLinksStore()
   const countryFlagStore = useCountryFlagStore()
 
+  // Setup internal and external states
   const lastCountrySearched = ref<LastCountrySearched>({
     countryCode: '',
     name: '',
