@@ -1,12 +1,12 @@
 <template>
-  <div class="last-searched-country-section-wrapper">
+  <div class="last-searched-country-section-wrapper" v-if="!loadingStatus && !errorStatus">
     <!-- Title -->
     <h2 class="section-title">
       Check out the information of the last searched country:
-      <span class="country-name">{{ lastCountrySearched.countryName }}</span>
+      <span class="country-name">{{ lastCountrySearched.name }}</span>
       <img
-        v-if="lastCountrySearched.countryFlagUrl"
-        :src="lastCountrySearched.countryFlagUrl"
+        v-if="lastCountrySearched.flagUrl"
+        :src="lastCountrySearched.flagUrl"
         alt="country-flag"
       />
     </h2>
@@ -17,11 +17,19 @@
         <CountryInfo />
       </div>
 
-      <!-- NEW TABLE -->
+      <!-- Holiday Table -->
       <div class="content-bottom">
         <CountryHolidayTable />
       </div>
     </div>
+  </div>
+  <!-- Error Status -->
+  <div class="error-status" v-else-if="errorStatus">
+    <p>Error fetching data, please try again later.</p>
+  </div>
+  <!-- Loading Status -->
+  <div class="loading-status" v-else>
+    <p>Loading...</p>
   </div>
 </template>
 
@@ -35,7 +43,7 @@ import { storeToRefs } from 'pinia'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 
-const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
+const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCountrySearchedStore)
 </script>
 
 <style scoped lang="scss">
@@ -50,14 +58,7 @@ const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
     font-weight: 500;
 
     .country-name {
-      text-decoration: underline;
       color: $color-primary-2;
-      cursor: pointer;
-      transition: all 0.3s ease;
-
-      &:hover {
-        color: $color-primary;
-      }
     }
   }
 }

@@ -1,36 +1,53 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Country } from '@/types/country'
+import type { Country, CountryInfo } from '@/types/country'
 import type { PublicHoliday } from '@/types/publicHolidays'
 //Stores
 import { useCountryFlagStore } from '@/stores/countryFlagStore'
 import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
-const API_URL = 'https://date.nager.at/api/v3/'
+import { devLog } from '@/utils/logger'
+
+const CONFIG = {
+  API_URL: 'https://date.nager.at/api/v3/',
+}
 
 export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   const availableCountries = ref<Country[]>([])
   const publicHolidaysWorldwide = ref<PublicHoliday[]>([])
-  const countryPublicHolidays = ref<PublicHoliday[]>([])
-  const isTodayPublicHoliday = ref<boolean>(false)
+  // create map of crountryName to Holidays
+  const countryHolidaysMap = ref<{ [key: string]: PublicHoliday[] }>({})
+  const isPublicHolidayTodayMap = ref<{ [key: string]: boolean }>({})
+  const publicHolidaysByYearMap = ref<{ [key: string]: PublicHoliday[] }>({})
+  const countryInfoMap = ref<{ [key: string]: CountryInfo }>({})
 
   const countryFlagStore = useCountryFlagStore()
   const wikipediaLinksStore = useWikipediaLinksStore()
 
-  const fetchAvailableCountries = async () => {
+  const getAvailableCountries = async () => {
+    // Return data if already fetched, avoid fetching again
+    if (availableCountries.value.length > 0) return availableCountries.value
+
     try {
-      const response = await fetch(`${API_URL}AvailableCountries`)
-      const data = await response.json()
+      const response = await fetch(`${CONFIG.API_URL}AvailableCountries`)
+      if (!response.ok) return []
+      const data = (await response.json()) as Country[]
       availableCountries.value = data
+      return data
     } catch (error) {
-      console.error(error)
-      throw new Error('Error fetching available countries')
+      devLog('Error fetching available countries:', error)
+      return []
     }
   }
 
-  const fetchPublicHolidaysWorldwide = async () => {
+  const getPublicHolidaysWorldwide = async () => {
+    // Return data if already fetched, avoid fetching again
+    if (publicHolidaysWorldwide.value.length > 0) return publicHolidaysWorldwide.value
+
     try {
-      const response = await fetch(`${API_URL}NextPublicHolidaysWorldwide`)
-      const data = await response.json()
+      const response = await fetch(`${CONFIG.API_URL}NextPublicHolidaysWorldwide`)
+      if (!response.ok) return null
+
+      const data = (await response.json()) as PublicHoliday[]
       // Add Flags
       await Promise.all(
         data.map(async (holiday: PublicHoliday) => {
@@ -39,8 +56,9 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
         }),
       )
       // Add Country Name
-      data.map((holiday: PublicHoliday) => {
-        const countryName = availableCountries.value.find(
+      data.map(async (holiday: PublicHoliday) => {
+        const countries = await getAvailableCountries()
+        const countryName = countries?.find(
           (country) => country.countryCode === holiday.countryCode,
         )?.name
         holiday.countryName = countryName
@@ -52,64 +70,111 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
         }),
       )
       publicHolidaysWorldwide.value = data
+      return structuredClone(data)
     } catch (error) {
-      console.error(error)
-      throw new Error('Error fetching public holidays')
+      devLog('Error fetching public holidays:', error)
+      return null
     }
   }
 
-  const fetchPublicHolidaysByCountry = async (countryCode: string) => {
+  const getPublicHolidaysByCountry = async (countryCode: string) => {
+    // Return data if already fetched, avoid fetching again
+    if (countryCode in countryHolidaysMap.value) {
+      return countryHolidaysMap.value[countryCode]
+    }
+
     try {
-      const response = await fetch(`${API_URL}NextPublicHolidays/${countryCode}`)
-      const data = await response.json()
-      countryPublicHolidays.value = data
+      const response = await fetch(`${CONFIG.API_URL}NextPublicHolidays/${countryCode}`)
+      if (!response.ok) return null
+
+      const data = (await response.json()) as PublicHoliday[]
+      countryHolidaysMap.value[countryCode] = data
+      return structuredClone(data)
     } catch (error) {
-      console.error(error)
-      throw new Error('Error fetching public holidays by country')
+      devLog('Error fetching public holidays by country:', error)
+      return null
     }
   }
 
-  const checkIfTodayIsHoliday = async (countryCode: string) => {
-    try {
-      const response = await fetch(`${API_URL}IsTodayPublicHoliday/${countryCode}`)
-      isTodayPublicHoliday.value = response.status === 200
-    } catch (error) {
-      console.error(error)
-      throw new Error('Error fetching if today is a public holiday')
+  const isTodayPublicHoliday = async (countryCode: string) => {
+    // Return data if already fetched, avoid fetching again
+    if (countryCode in isPublicHolidayTodayMap.value) {
+      return isPublicHolidayTodayMap.value[countryCode]
     }
-  }
 
-  const fetchPublicHolidaysByYear = async (year: number, countryCode: string) => {
     try {
-      const response = await fetch(`${API_URL}PublicHolidays/${year}/${countryCode}`)
-      if (response.status !== 200) {
-        throw new Error()
-      }
-      const data = await response.json()
+      const response = await fetch(`${CONFIG.API_URL}IsTodayPublicHoliday/${countryCode}`)
+      if (!response.ok) return null
+
+      const data = response.status === 200
+      isPublicHolidayTodayMap.value[countryCode] = data
       return data
     } catch (error) {
-      throw new Error('Error fetching public holidays by year')
+      devLog('Error fetching if today is a public holiday:', error)
+      return null
     }
   }
 
   const getPublicHolidaysByYear = async (year: number, countryCode: string) => {
+    // Return data if already fetched, avoid fetching again
+    if (`${countryCode}-${year}` in publicHolidaysByYearMap.value) {
+      return publicHolidaysByYearMap.value[`${countryCode}-${year}`]
+    }
+
     try {
-      const data = await fetchPublicHolidaysByYear(year, countryCode)
-      return data
+      const response = await fetch(`${CONFIG.API_URL}PublicHolidays/${year}/${countryCode}`)
+      if (!response.ok) return null
+
+      const data = (await response.json()) as PublicHoliday[]
+
+      // Add Wikipedia Link
+      await Promise.all(
+        data.map(async (holiday: PublicHoliday) => {
+          holiday.wikipediaLink = await wikipediaLinksStore.getWikipediaLink(holiday.name)
+        }),
+      )
+      publicHolidaysByYearMap.value[`${countryCode}-${year}`] = data
+      return structuredClone(data)
     } catch (error) {
+      devLog('Error fetching public holidays by year:', error)
+      return null
+    }
+  }
+
+  const getCountryInfo = async (countryCode: string) => {
+    if (countryCode in countryInfoMap.value) {
+      return countryInfoMap.value[countryCode]
+    }
+
+    try {
+      const response = await fetch(`${CONFIG.API_URL}CountryInfo/${countryCode}`)
+      if (!response.ok) return null
+
+      const data = await response.json()
+      data.borders = await Promise.all(
+        data.borders.map(async (border: CountryInfo) => {
+          return {
+            ...border,
+            flagUrl: await countryFlagStore.getCountryFlag(border.countryCode.toLowerCase()),
+          }
+        }),
+      )
+      data.isHolidayToday = await isTodayPublicHoliday(countryCode)
+      countryInfoMap.value[countryCode] = data
+      return structuredClone(data)
+    } catch (error) {
+      devLog('Error fetching country info:', error)
       return null
     }
   }
 
   return {
     availableCountries,
-    fetchAvailableCountries,
-    publicHolidaysWorldwide,
-    fetchPublicHolidaysWorldwide,
-    countryPublicHolidays,
-    fetchPublicHolidaysByCountry,
+    getAvailableCountries,
+    getPublicHolidaysWorldwide,
+    getPublicHolidaysByCountry,
     isTodayPublicHoliday,
-    checkIfTodayIsHoliday,
     getPublicHolidaysByYear,
+    getCountryInfo,
   }
 })

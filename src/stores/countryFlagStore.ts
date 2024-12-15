@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-const FLAG_URL = 'https://flagcdn.com/24x18'
+const CONFIG = {
+  STORAGE_KEY: 'countryFlag',
+  API_BASE_URL: 'https://flagcdn.com/24x18',
+}
 
 type CountryFlag = {
   [key: string]: string
@@ -11,7 +14,7 @@ export const useCountryFlagStore = defineStore('countryFlag', () => {
   const countriesFlagObj = ref<CountryFlag>({})
 
   const loadCountryFlag = () => {
-    const countryFlagStored = localStorage.getItem('countryFlag')
+    const countryFlagStored = localStorage.getItem(CONFIG.STORAGE_KEY)
     if (countryFlagStored) {
       countriesFlagObj.value = JSON.parse(countryFlagStored)
     }
@@ -19,14 +22,15 @@ export const useCountryFlagStore = defineStore('countryFlag', () => {
 
   const fetchCountryFlag = async (countryCode: string) => {
     try {
-      const response = await fetch(`${FLAG_URL}/${countryCode}.webp`)
+      const response = await fetch(`${CONFIG.API_BASE_URL}/${countryCode}.webp`)
+      if (!response.ok) return null
+
       const flagUrl = response.url
       countriesFlagObj.value[countryCode] = flagUrl
-      localStorage.setItem('countryFlag', JSON.stringify(countriesFlagObj.value))
+      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(countriesFlagObj.value))
       return flagUrl
     } catch (error) {
-      console.error(error)
-      throw new Error('Error fetching countries flags')
+      return null
     }
   }
 
@@ -36,10 +40,9 @@ export const useCountryFlagStore = defineStore('countryFlag', () => {
     if (countriesFlagObj.value[normalizedCountryCode]) {
       return countriesFlagObj.value[normalizedCountryCode]
     } else {
-      const flagUrl = await fetchCountryFlag(normalizedCountryCode)
-      return flagUrl
+      return await fetchCountryFlag(normalizedCountryCode)
     }
   }
 
-  return { countriesFlagObj, getCountryFlag, loadCountryFlag }
+  return { getCountryFlag, loadCountryFlag }
 })

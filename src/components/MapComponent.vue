@@ -2,7 +2,6 @@
   <div class="map-container">
     <div class="tooltip"></div>
     <div class="hover-effect">
-      <!-- SVG Code -->
       <svg
         id="allSvg"
         baseprofile="tiny"
@@ -2381,7 +2380,7 @@ const props = defineProps({
 
 const emit = defineEmits(['onCountrySelected'])
 
-const currentlySelected = ref<string | null>()
+const currentlySelected = ref<string | null>(props.selectedCountry)
 const tooltip = ref<HTMLElement>()
 
 //watch selectedCountry
@@ -2494,7 +2493,17 @@ const updateTooltipPosition = (e: MouseEvent) => {
   }
 }
 
-onMounted(setupMapInteractions)
+onMounted(() => {
+  setupMapInteractions()
+
+  // Initialize currentSelected if there's a selectedCountry prop
+  if (props.selectedCountry) {
+    currentlySelected.value = props.selectedCountry
+    getAllPathsForCountry(props.selectedCountry).forEach((path) => {
+      path.style.fill = props.colors.selected
+    })
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -2508,8 +2517,8 @@ onMounted(setupMapInteractions)
 
 .hover-effect {
   width: 100%;
-  max-width: 2000px;
-  aspect-ratio: 2000/857; /* Maintains SVG's aspect ratio */
+  max-width: pxToRem(2000);
+  aspect-ratio: 2000/857;
   position: relative;
 }
 
@@ -2532,7 +2541,7 @@ svg {
 .tooltip {
   position: absolute;
   background-color: rgba(0, 0, 0, 0.8);
-  color: white;
+  color: $pure-white;
   padding: pxToRem(8) pxToRem(12);
   border-radius: pxToRem(4);
   font-size: pxToRem(14);

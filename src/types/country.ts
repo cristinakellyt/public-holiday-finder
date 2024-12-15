@@ -1,23 +1,21 @@
+import type { PublicHoliday } from '@/types/publicHolidays'
+
 type Country = {
   countryCode: string
   name: string
+  flagUrl?: string | null
 }
 
-type CountryInfo = {
+type CountryInfo = Country & {
   commonName: string
   officialName: string
-  countryCode: string
   region: string
-  borders: Border[]
+  isHolidayToday: boolean
+  borders: CountryInfo[]
 }
 
-type Border = {
-  commonName: string
-  officialName: string
-  countryCode: string
-  region: string
-  borders: unknown[]
-  flagUrl?: string
+type LastCountrySearched = Country & {
+  holidays: PublicHoliday[]
 }
 
-export type { Country, CountryInfo, Border }
+export type { Country, CountryInfo, LastCountrySearched }

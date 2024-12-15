@@ -6,15 +6,16 @@
         <h2 class="title">
           <span
             v-if="
-              (!countryHolidaysByYear && filterYear?.toString().length !== 4) || filterYearHasError
+              (!countryHolidaysByYear && filterYear?.toString().length !== 4) ||
+              fetchHolidayByYearError
             "
           >
             Next
           </span>
-          Public Holidays in {{ lastCountrySearched.countryName }}
+          Public Holidays in {{ lastCountrySearched.name }}
           <img
-            v-if="lastCountrySearched.countryFlagUrl"
-            :src="lastCountrySearched.countryFlagUrl"
+            v-if="lastCountrySearched.flagUrl"
+            :src="lastCountrySearched.flagUrl"
             alt="country-flag"
           />
           <span v-if="countryHolidaysByYear && filterYear?.toString().length === 4">
@@ -76,7 +77,7 @@
           placeholder="Filter by year"
           type="number"
           field-name="filterYear"
-          :text-error="filterYearHasError ? `Year ${filterYear} is out of range` : null"
+          :text-error="fetchHolidayByYearError ? `Year ${filterYear} is out of range` : null"
           label-text="Filter by year:"
         />
       </div>
@@ -114,13 +115,15 @@ const lastCountrySearchedStore = useLastCountrySearchedStore()
 const publicHolidaysStore = usePublicHolidaysStore()
 
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
-const countrySearchedCopy = ref(lastCountrySearched.value)
+const countryHolidaySearchedCopy = ref(
+  JSON.parse(JSON.stringify(lastCountrySearched.value.holidays)),
+)
 const countryHolidaysByYear = ref<PublicHoliday[] | null>(null)
 
-const tableData = ref(lastCountrySearched.value.holidays)
+const tableData = ref<PublicHoliday[]>([])
 
 const filterYear = ref<number | null>(null)
-const filterYearHasError = ref(false)
+const fetchHolidayByYearError = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(5)
 
@@ -144,11 +147,11 @@ const handleSort = (column: string) => {
   } else {
     // If clicking a new column, set it as current and default to ascending
     currentSortColumn.value = column
-    sortDirection.value = 'asc'
+    sortDirection.value = 'desc'
   }
 
   // Sort the holidays array
-  countrySearchedCopy.value.holidays.sort((a: PublicHoliday, b: PublicHoliday) => {
+  tableData.value.sort((a: PublicHoliday, b: PublicHoliday) => {
     // Handle null/undefined values by pushing them to the end
     if (!a[column as keyof PublicHoliday]) return 1
     if (!b[column as keyof PublicHoliday]) return -1
@@ -170,7 +173,6 @@ const handleSort = (column: string) => {
       )
     )
   })
-  updatePage(1)
 }
 
 const updatePage = (page: number) => {
@@ -182,11 +184,9 @@ const getPaginatedData = () => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = currentPage.value * pageSize.value
 
-  if (countryHolidaysByYear.value === null || filterYearHasError.value) {
-    console.log('all holidays')
-    tableData.value = countrySearchedCopy.value.holidays.slice(startIndex, endIndex)
+  if (countryHolidaysByYear.value === null || fetchHolidayByYearError.value) {
+    tableData.value = countryHolidaySearchedCopy.value.slice(startIndex, endIndex)
   } else {
-    console.log('holidays by year')
     tableData.value = countryHolidaysByYear.value.slice(startIndex, endIndex)
   }
 
@@ -212,10 +212,13 @@ const getPaginatedData = () => {
 watch(
   () => lastCountrySearched.value,
   (newValue, oldValue) => {
-    if (newValue.countryName !== oldValue.countryName) {
-      console.log(lastCountrySearched, 'las')
+    if (newValue.name !== oldValue.name) {
       filterYear.value = null
-      countrySearchedCopy.value = JSON.parse(JSON.stringify(lastCountrySearched.value))
+      countryHolidaySearchedCopy.value = JSON.parse(
+        JSON.stringify(lastCountrySearched.value.holidays),
+      )
+      // reset holidays by year
+      countryHolidaysByYear.value = null
       updatePage(1)
     }
   },
@@ -223,7 +226,7 @@ watch(
 
 const handleFilterYear = async (inputValue: string) => {
   filterYear.value = Number(inputValue)
-  filterYearHasError.value = false
+  fetchHolidayByYearError.value = false
 
   if (!filterYear.value) {
     countryHolidaysByYear.value = null
@@ -233,8 +236,7 @@ const handleFilterYear = async (inputValue: string) => {
 
   if (filterYear.value.toString().length > 4) {
     countryHolidaysByYear.value = null
-    filterYearHasError.value = true
-
+    fetchHolidayByYearError.value = true
     updatePage(1)
     return
   }
@@ -247,9 +249,9 @@ const handleFilterYear = async (inputValue: string) => {
     )
 
     if (countryHolidaysByYear.value !== null) {
-      filterYearHasError.value = false
+      fetchHolidayByYearError.value = false
     } else {
-      filterYearHasError.value = true
+      fetchHolidayByYearError.value = true
     }
     updatePage(1)
   }
@@ -261,10 +263,6 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-// .last-searched-country-wrapper {
-// max-width: pxToRem(800);
-// }
-
 .title {
   @include flex-gap(row, pxToRem(10), center, center);
   font-size: pxToRem(22);

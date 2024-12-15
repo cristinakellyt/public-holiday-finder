@@ -1,5 +1,5 @@
 <template>
-  <div class="country-info-wrapper">
+  <div class="country-info-wrapper" v-if="countryInfo">
     <!-- TODO: add favorite feature and fix the icons -->
     <img
       class="favorite-icon"
@@ -42,7 +42,9 @@
               :key="index"
               @click="selectCountry(border.countryCode)"
             >
-              <img :src="border.flagUrl" alt="border-flag" />{{ border.commonName }}
+              <img v-if="border.flagUrl" :src="border.flagUrl" alt="border-flag" />{{
+                border.commonName
+              }}
             </span>
           </div>
         </div>
@@ -58,30 +60,33 @@ import { storeToRefs } from 'pinia'
 //Components
 import CountryMap from '@/components/CountryMap.vue'
 //Stores
-import { useCountryStore } from '@/stores/countryStore'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Icons
 import icFavoriteEmpty from '@/assets/icons/ic_favorite_empty.svg'
 import icFavoriteFullGreen from '@/assets/icons/ic_favorite_full_green.svg'
+//Types
+import type { CountryInfo } from '@/types/country'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
-const countryStore = useCountryStore()
 const publicHolidaysStore = usePublicHolidaysStore()
 
 const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
-const { countryInfo } = storeToRefs(countryStore)
-const { availableCountries, isTodayPublicHoliday } = storeToRefs(publicHolidaysStore)
+const { availableCountries } = storeToRefs(publicHolidaysStore)
 const isCountryFavorite = ref(false)
+const countryInfo = ref<CountryInfo | null>(null)
 
 onMounted(async () => {
-  await countryStore.fetchCountryInfo(lastCountrySearched.value.countryCode)
-  await publicHolidaysStore.checkIfTodayIsHoliday(lastCountrySearched.value.countryCode)
+  countryInfo.value = await publicHolidaysStore.getCountryInfo(
+    lastCountrySearched.value.countryCode,
+  )
 })
 
 //watch lastCountrySearched
 watch(lastCountrySearched, async () => {
-  await countryStore.fetchCountryInfo(lastCountrySearched.value.countryCode)
+  countryInfo.value = await publicHolidaysStore.getCountryInfo(
+    lastCountrySearched.value.countryCode,
+  )
 })
 
 const selectCountry = async (countryCode: string) => {
@@ -102,14 +107,18 @@ const favoriteCountry = () => {
 }
 
 const getTextForBorders = computed(() => {
+  if (countryInfo.value === null) return 'Error fetching country info'
   return countryInfo.value.borders.length > 0 ? 'borders with: ' : 'no borders'
 })
 
 const getTextForTodayIsHoliday = computed(() => {
-  if (isTodayPublicHoliday.value) {
-    return `Today is a public holiday in ${lastCountrySearched.value.countryName}! It's ${lastCountrySearched.value.holidays[0].name}`
+  if (countryInfo.value?.isHolidayToday === null)
+    return 'Sorry, we are not able to check if today is a public holiday in this country'
+
+  if (countryInfo.value?.isHolidayToday) {
+    return `Today is a public holiday in ${lastCountrySearched.value.name}! It's ${lastCountrySearched.value.holidays[0].name}`
   } else {
-    return `Today is not a public holiday in ${lastCountrySearched.value.countryName}`
+    return `Today is not a public holiday in ${lastCountrySearched.value.name}`
   }
 })
 </script>

@@ -1,18 +1,18 @@
 <template>
   <main>
-    <BaseWidth v-if="availableCountries.length > 0">
+    <BaseWidth>
       <SearchCountry />
       <MapComponent
         :clickable-countries="getCountriesNames"
         @onCountrySelected="onCountrySelected"
-        :selected-country="lastCountrySearched.countryName"
+        :selected-country="lastCountrySearched.name"
       />
+      <p class="error-message" v-if="availableCountries.length === 0">
+        Sorry, we are experiencing issues, please try again later.
+      </p>
       <CountryDetailSection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
       />
-      <!-- <LastSearchedCountrySection
-        v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
-      /> -->
       <TableHolidaysWorldwide />
     </BaseWidth>
   </main>
@@ -25,7 +25,6 @@ import { computed } from 'vue'
 //Components
 import SearchCountry from '@/components/SearchCountry.vue'
 import TableHolidaysWorldwide from '@/components/TableHolidaysWorldwide.vue'
-// import LastSearchedCountrySection from '@/components/LastSearchedCountrySection.vue'
 import MapComponent from '@/components/MapComponent.vue'
 import CountryDetailSection from '@/components/CountryDetailSection .vue'
 //Stores
@@ -51,4 +50,10 @@ const onCountrySelected = async (countryName: string) => {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.error-message {
+  text-align: center;
+  margin-top: pxToRem(20);
+  color: $red;
+}
+</style>

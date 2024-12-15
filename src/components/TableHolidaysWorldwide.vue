@@ -1,6 +1,6 @@
 <template>
-  <div class="table-holidays-worldwide">
-    <BaseTable v-if="tableData.length > 0" :options="tableOptions" :table-data="tableData">
+  <div class="table-holidays-worldwide" v-if="tableData !== null">
+    <BaseTable :options="tableOptions" :table-data="tablePaginatedData">
       <!-- Title -->
       <template #title>
         <h2 class="title">Public Holidays Worldwide</h2>
@@ -52,13 +52,14 @@
 <script setup lang="ts">
 //Vue
 import { onMounted, ref } from 'vue'
-import { storeToRefs } from 'pinia'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Utils
 import dateFormatter from '@/utils/dateFormatter'
 //Icons
 import icRedirectLink from '@/assets/icons/ic_redirect_link.svg'
+//Types
+import type { PublicHoliday } from '@/types/publicHolidays'
 
 const publicHolidaysStore = usePublicHolidaysStore()
 
@@ -70,30 +71,27 @@ const tableOptions = {
   },
 }
 
-const { publicHolidaysWorldwide } = storeToRefs(publicHolidaysStore)
-const tableData = ref(publicHolidaysWorldwide.value)
+const tableData = ref<PublicHoliday[] | null>(null)
+const tablePaginatedData = ref<PublicHoliday[]>([])
 const currentPage = ref(1)
 const pageSize = ref(5)
 
 //Fetch public holidays worldwide and fill data with flags and country name to display in table
 onMounted(async () => {
-  try {
-    await publicHolidaysStore.fetchPublicHolidaysWorldwide()
-    getPaginatedData()
-  } catch (error) {
-    console.error(error)
-  }
+  tableData.value = await publicHolidaysStore.getPublicHolidaysWorldwide()
+  getPaginatedData()
 })
 
-function updatePage(page: number) {
+const updatePage = (page: number) => {
   currentPage.value = page
   getPaginatedData()
 }
 
-function getPaginatedData() {
+const getPaginatedData = () => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = startIndex + pageSize.value
-  tableData.value = publicHolidaysWorldwide.value.slice(startIndex, endIndex)
+  tablePaginatedData.value = tableData.value?.slice(startIndex, endIndex) ?? []
+  // TODO: add empty rows in BaseTable
 }
 </script>
 

@@ -9,7 +9,7 @@
       placeholder="Search for a country"
       :debounce-time="200"
       :search-query="searchKey"
-      @onSearch="fetchLocations"
+      @onSearch="getCountries"
       @onArrowDown="handleArrowDown"
       @onArrowUp="handleArrowUp"
       @onEnter="handleEnter"
@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 //Vue
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 // Components
 import SearchBar from '@/components/BasicComponents/SearchBar.vue'
@@ -42,11 +42,14 @@ const publicHolidaysStore = usePublicHolidaysStore()
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 const { availableCountries } = storeToRefs(publicHolidaysStore)
 const filteredCountries = ref<Country[] | null>(null)
-const searchError = ref<boolean>(false)
 const searchKey = ref<string>('')
 const popupListRef = ref<InstanceType<typeof PopUpList> | null>(null)
 
-const fetchLocations = (searchQuery: string) => {
+const searchError = computed(() => {
+  return availableCountries.value.length === 0
+})
+
+const getCountries = (searchQuery: string) => {
   searchKey.value = searchQuery
 
   // If the search key is empty, set the filtered countries to null
@@ -72,7 +75,6 @@ const closePopUpList = () => {
 }
 
 const handleArrowDown = () => {
-  console.log('handleArrowDown')
   popupListRef.value?.moveDown()
 }
 
