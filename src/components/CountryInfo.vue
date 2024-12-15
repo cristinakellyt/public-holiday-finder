@@ -1,44 +1,36 @@
 <template>
-  <div class="country-info-wrapper" v-if="countryInfo">
+  <div class="country-info-wrapper" v-if="props.countryDetails">
     <!-- TODO: add favorite feature and fix the icons -->
     <img
       class="favorite-icon"
-      v-if="isCountryFavorite"
-      :src="icFavoriteFullGreen"
+      :src="getIconForFavorite"
       alt="favorite"
-      @click="favoriteCountry"
-    />
-    <img
-      v-else
-      class="favorite-icon"
-      :src="icFavoriteEmpty"
-      alt="favorite"
-      @click="favoriteCountry"
+      @click="toggleFavoriteCountry"
     />
     <div class="content-wrapper">
       <!-- Map -->
-      <CountryMap class="map-wrapper" :country-code="lastCountrySearched.countryCode" />
+      <CountryMap class="map-wrapper" :country-code="props.countryDetails.countryCode" />
       <div class="content-info">
         <!-- Country Info -->
         <div>
           <span class="bold">Official Name: </span>
-          <span class="country-info-official-name">{{ countryInfo.officialName }}</span>
+          <span class="country-info-official-name">{{ props.countryDetails.officialName }}</span>
         </div>
         <p class="bold">
           {{ getTextForTodayIsHoliday }}
         </p>
         <div>
           <span class="bold">Region: </span>
-          <span class="country-info-region">{{ countryInfo.region }}</span>
+          <span class="country-info-region">{{ props.countryDetails.region }}</span>
         </div>
         <div>
           <span class="bold">This country has {{ getTextForBorders }}</span>
           <!-- Show only if there are borders -->
-          <div class="border-info-wrapper" v-if="countryInfo.borders.length > 0">
+          <div class="border-info-wrapper" v-if="props.countryDetails.borders.length > 0">
             <span
               class="border-names"
               :class="{ unavailable: isBorderUnavailable(border.countryCode) }"
-              v-for="(border, index) in countryInfo.borders"
+              v-for="(border, index) in props.countryDetails.borders"
               :key="index"
               @click="selectCountry(border.countryCode)"
             >
@@ -57,6 +49,7 @@
 //Vue
 import { computed, onMounted, watch, ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 //Components
 import CountryMap from '@/components/CountryMap.vue'
 //Stores
@@ -70,31 +63,51 @@ import type { CountryInfo } from '@/types/country'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 const publicHolidaysStore = usePublicHolidaysStore()
+const router = useRouter()
 
-const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
+const emit = defineEmits(['onSaved'])
+
+const props = defineProps<{
+  countryDetails: CountryInfo
+}>()
+const isCountryFavorite = ref(props.countryDetails.isFavorite)
+
+watch(
+  () => props.countryDetails.isFavorite,
+  (newValue) => {
+    console.log('newValue for isFavorite', newValue)
+    isCountryFavorite.value = newValue
+  },
+)
+
 const { availableCountries } = storeToRefs(publicHolidaysStore)
-const isCountryFavorite = ref(false)
+
 const countryInfo = ref<CountryInfo | null>(null)
 
 onMounted(async () => {
-  countryInfo.value = await publicHolidaysStore.getCountryInfo(
-    lastCountrySearched.value.countryCode,
-  )
+  await updateCountryInfo()
 })
 
-//watch lastCountrySearched and update countryInfo
-watch(lastCountrySearched, async () => {
-  countryInfo.value = await publicHolidaysStore.getCountryInfo(
-    lastCountrySearched.value.countryCode,
-  )
+//watch changes in props.countryDetails and update countryInfo
+watch(props.countryDetails, async () => {
+  await updateCountryInfo()
 })
+
+const updateCountryInfo = async () => {
+  countryInfo.value = await publicHolidaysStore.getCountryInfo(props.countryDetails.countryCode)
+}
 
 const selectCountry = async (countryCode: string) => {
-  if (countryCode === lastCountrySearched.value.countryCode) return
+  if (countryCode === props.countryDetails.countryCode) return
   //check if countryCode exists in availableCountries
   const country = availableCountries.value.find((country) => country.countryCode === countryCode)
   if (country) {
     await lastCountrySearchedStore.setLastCountrySearched(countryCode)
+  }
+
+  // If the card is used as a favorite, redirect to home
+  if (isCountryFavorite.value) {
+    router.push({ name: 'home' })
   }
 }
 
@@ -102,9 +115,20 @@ const isBorderUnavailable = (countryCode: string) => {
   return !availableCountries.value.find((country) => country.countryCode === countryCode)
 }
 
-const favoriteCountry = () => {
-  isCountryFavorite.value = !isCountryFavorite.value
+const toggleFavoriteCountry = () => {
+  // props.countryDetails.isFavorite = !props.countryDetails.isFavorite
+  if (isCountryFavorite.value) {
+    emit('onSaved', false, props.countryDetails.countryCode)
+    //   favoritesCountriesStore.addFavoriteCountry(props.countryDetails.countryCode)
+  } else {
+    emit('onSaved', true, props.countryDetails.countryCode)
+    //   favoritesCountriesStore.removeFavoriteCountry(props.countryDetails.countryCode)
+  }
 }
+
+const getIconForFavorite = computed(() => {
+  return isCountryFavorite.value ? icFavoriteFullGreen : icFavoriteEmpty
+})
 
 const getTextForBorders = computed(() => {
   if (countryInfo.value === null) return 'Error fetching country info'
@@ -116,9 +140,9 @@ const getTextForTodayIsHoliday = computed(() => {
     return 'Sorry, we are not able to check if today is a public holiday in this country'
 
   if (countryInfo.value?.isHolidayToday) {
-    return `Today is a public holiday in ${lastCountrySearched.value.name}! It's ${lastCountrySearched.value.holidays[0].name}`
+    return `Today is a public holiday in ${props.countryDetails.commonName}! `
   } else {
-    return `Today is not a public holiday in ${lastCountrySearched.value.name}`
+    return `Today is not a public holiday in ${props.countryDetails.commonName}`
   }
 })
 </script>
@@ -130,6 +154,7 @@ const getTextForTodayIsHoliday = computed(() => {
   padding: pxToRem(10);
   border-radius: pxToRem(10);
   box-shadow: pxToRem(2) pxToRem(3) pxToRem(6) 0 $color-primary-2;
+  margin-bottom: pxToRem(50);
 
   .map-wrapper {
     width: 100%;

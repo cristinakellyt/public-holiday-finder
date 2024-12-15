@@ -1,10 +1,11 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import type { Country, CountryInfo } from '@/types/country'
 import type { PublicHoliday } from '@/types/publicHolidays'
 //Stores
 import { useCountryFlagStore } from '@/stores/countryFlagStore'
 import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
+import { useFavoritesCountriesStore } from '@/stores/favoritesCountriesStore'
 import { devLog } from '@/utils/logger'
 
 const CONFIG = {
@@ -19,6 +20,9 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   const isPublicHolidayTodayMap = ref<{ [key: string]: boolean }>({})
   const publicHolidaysByYearMap = ref<{ [key: string]: PublicHoliday[] }>({})
   const countryInfoMap = ref<{ [key: string]: CountryInfo }>({})
+
+  const favoritesCountriesStore = useFavoritesCountriesStore()
+  const { favoritesCountries } = storeToRefs(favoritesCountriesStore)
 
   const countryFlagStore = useCountryFlagStore()
   const wikipediaLinksStore = useWikipediaLinksStore()
@@ -160,12 +164,20 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
         }),
       )
       data.isHolidayToday = await isTodayPublicHoliday(countryCode)
+
+      data.isFavorite = favoritesCountries.value.includes(countryCode)
       countryInfoMap.value[countryCode] = data
       return structuredClone(data)
     } catch (error) {
       devLog('Error fetching country info:', error)
       return null
     }
+  }
+
+  const updateIfCountryIsFavorite = () => {
+    Object.keys(countryInfoMap.value).forEach((countryCode) => {
+      countryInfoMap.value[countryCode].isFavorite = favoritesCountries.value.includes(countryCode)
+    })
   }
 
   return {
@@ -176,5 +188,6 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     isTodayPublicHoliday,
     getPublicHolidaysByYear,
     getCountryInfo,
+    updateIfCountryIsFavorite,
   }
 })

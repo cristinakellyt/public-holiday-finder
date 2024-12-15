@@ -2489,7 +2489,7 @@ const updateTooltipPosition = (e: MouseEvent) => {
   // Position tooltip at cursor position with a small offset
   if (tooltipElement) {
     tooltipElement.style.left = `${e.pageX}px`
-    tooltipElement.style.top = `${e.pageY - 5}px` // Offset up by 30px to appear above cursor
+    tooltipElement.style.top = `${e.pageY - 5}px`
   }
 }
 
