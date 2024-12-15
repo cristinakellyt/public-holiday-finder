@@ -25,64 +25,64 @@ const props = defineProps({
    */
   text: {
     type: String,
-    default: 'Button text'
+    default: 'Button text',
   },
   /**
    * Button style - 'primary', 'secondary', 'tertiary', 'inverted', or 'clean'
    */
   buttonStyle: {
     type: String as PropType<'primary' | 'secondary' | 'tertiary' | 'inverted' | 'clean'>,
-    default: 'primary'
+    default: 'primary',
   },
   /**
    * Button size - 'small', 'medium', or 'large'
    */
   size: {
     type: String as PropType<'small' | 'medium' | 'large'>,
-    default: 'small'
+    default: 'small',
   },
   /**
    * Button type - 'button', 'submit', or 'reset'
    */
   buttonType: {
     type: String as PropType<'button' | 'submit' | 'reset'>,
-    default: 'button'
+    default: 'button',
   },
   /**
    * Path to navigate to (used in <RouterLink>)
    */
   path: {
     type: Object,
-    default: null
+    default: null,
   },
   /**
    * If the button is disabled
    */
   isDisabled: {
     type: Boolean,
-    default: false
+    default: false,
   },
   /**
    * Icon URL for the button
    */
   icon: {
     type: String,
-    default: null
+    default: null,
   },
   /**
    * Icon URL to display before the text
    */
   iconBefore: {
     type: String,
-    default: null
+    default: null,
   },
   /**
    * Additional class for the button
    */
   extraClass: {
     type: String,
-    default: null
-  }
+    default: null,
+  },
 })
 
 const classes = computed(() => [
@@ -91,8 +91,8 @@ const classes = computed(() => [
   {
     'button-wrapper': true,
     'is-disabled': props.isDisabled,
-    [props.extraClass || '']: true
-  }
+    [props.extraClass || '']: true,
+  },
 ])
 </script>
 
@@ -187,8 +187,8 @@ const classes = computed(() => [
     opacity: 0.5;
   }
 }
-// TODO: adapt to scss mixin
-@media only screen and (max-width: $tablet) {
+
+@include media-query($tablet) {
   .button-wrapper {
     &.small {
       font-size: pxToRem(10);

@@ -104,7 +104,7 @@ const emit = defineEmits<{
 const inputValue = ref<string>()
 const inputTimeout = ref<ReturnType<typeof setTimeout> | null>(null)
 
-// watch for changes in the input props
+// watch for changes in the input props and set the input value
 watch(
   () => props.input,
   (newValue) => {
@@ -128,7 +128,7 @@ const onFocus = () => {
   emit('focus')
 }
 
-//watch input to check max length
+//watch input to check max length and emit inputChange
 watch(inputValue, (newValue) => {
   if (newValue && newValue.length > props.maxLength) {
     inputValue.value = newValue.slice(0, props.maxLength)

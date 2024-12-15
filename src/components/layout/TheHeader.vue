@@ -14,7 +14,17 @@
             class="favorite-icon"
             @click="navigateTo('saved-country')"
           />
-          <img src="@/assets/icons/ic_info.svg" alt="info" title="Info" class="info-icon" />
+          <img
+            src="@/assets/icons/ic_info.svg"
+            alt="info"
+            title="Info"
+            class="info-icon"
+            @click="openInfoModal"
+          />
+
+          <AnimationTransition name="fade" mode="out-in">
+            <InfoModal v-if="isInfoModalOpen" @close="() => (isInfoModalOpen = false)" />
+          </AnimationTransition>
         </div>
       </nav>
     </BaseWidth>
@@ -22,15 +32,25 @@
 </template>
 
 <script setup lang="ts">
+//Vue
+import { ref } from 'vue'
 //Vue Router
 import { useRouter } from 'vue-router'
 //Icons
 import icCalendar from '@/assets/icons/ic_calendar.svg'
-
+import AnimationTransition from '../BasicComponents/AnimationTransition.vue'
+import InfoModal from '../InfoModal.vue'
+//Components
 const router = useRouter()
 
 const navigateTo = (path: string) => {
   router.push({ name: path })
+}
+
+const isInfoModalOpen = ref<boolean>(false)
+
+const openInfoModal = () => {
+  isInfoModalOpen.value = true
 }
 </script>
 
