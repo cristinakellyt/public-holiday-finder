@@ -1,6 +1,5 @@
 <template>
   <div class="country-info-wrapper" v-if="props.countryDetails">
-    <!-- TODO: add favorite feature and fix the icons -->
     <img
       class="favorite-icon"
       :src="getIconForFavorite"
@@ -88,11 +87,6 @@ onMounted(async () => {
   await updateCountryInfo()
 })
 
-//watch changes in props.countryDetails and update countryInfo
-watch(props.countryDetails, async () => {
-  await updateCountryInfo()
-})
-
 const updateCountryInfo = async () => {
   countryInfo.value = await publicHolidaysStore.getCountryInfo(props.countryDetails.countryCode)
 }
@@ -145,6 +139,15 @@ const getTextForTodayIsHoliday = computed(() => {
     return `Today is not a public holiday in ${props.countryDetails.commonName}`
   }
 })
+
+//watch changes in props.countryDetails and update countryInfo
+watch(
+  () => props.countryDetails,
+  async () => {
+    await updateCountryInfo()
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped lang="scss">

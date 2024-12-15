@@ -60,9 +60,15 @@ const onCountrySelected = async (countryName: string) => {
 
 // When the lastCountrySearched is filled, set the firstLoad to false
 // This is used to show the spinner while the lastCountrySearched is filled for the first time
-watch(lastCountrySearched, () => {
-  firstLoad.value = false
-})
+watch(
+  () => lastCountrySearched.value,
+  () => {
+    if (lastCountrySearched.value.countryCode) {
+      firstLoad.value = false
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <style scoped lang="scss">
