@@ -13,7 +13,11 @@
     <div class="content-wrapper">
       <!-- Country Info -->
       <div class="content-top">
-        <CountryInfo />
+        <CountryInfo
+          v-if="countryData"
+          :country-details="countryData"
+          @onSaved="toggleFavoriteCountry"
+        />
       </div>
 
       <!-- Holiday Table -->
@@ -35,16 +39,47 @@
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 //Components
 import CountryInfo from '@/components/CountryInfo.vue'
 import CountryHolidayTable from '@/components/CountryHolidayTable.vue'
 //Stores
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
-import { storeToRefs } from 'pinia'
+import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
+import { useFavoritesCountriesStore } from '@/stores/favoritesCountriesStore'
+//Types
+import type { CountryInfo as TypeCountryInfo } from '@/types/country'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
-
+const publicHolidaysStore = usePublicHolidaysStore()
+const favoritesCountriesStore = useFavoritesCountriesStore()
 const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCountrySearchedStore)
+
+const countryData = ref<TypeCountryInfo | null>(null)
+
+watch(
+  () => lastCountrySearched.value,
+  async () => {
+    countryData.value = await publicHolidaysStore.getCountryInfo(
+      lastCountrySearched.value.countryCode,
+    )
+  },
+  { immediate: true },
+)
+
+const updateCountryData = async (countryCode: string) => {
+  countryData.value = await publicHolidaysStore.getCountryInfo(countryCode)
+}
+
+const toggleFavoriteCountry = (isFavorite: boolean, countryCode: string) => {
+  if (isFavorite) {
+    favoritesCountriesStore.addFavoriteCountry(countryCode)
+  } else {
+    favoritesCountriesStore.removeFavoriteCountry(countryCode)
+  }
+  updateCountryData(countryCode)
+}
 </script>
 
 <style scoped lang="scss">
@@ -66,7 +101,7 @@ const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCoun
 }
 
 .content-wrapper {
-  @include flex-direction-align-justify(column, pxToRem(50), center, center);
+  @include flex-direction-align-justify(column, 0, center, center);
   width: 100%;
   margin: pxToRem(20) 0 pxToRem(30) 0;
 

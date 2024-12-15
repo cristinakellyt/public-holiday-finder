@@ -6,7 +6,6 @@ $color-primary-2: #144c44;
 
 //GREEN COLORS
 $green-1: #e5f4f2;
-$green-2: #309b42;
 
 //GREY COLORS
 $pure-white: #ffffff;
@@ -22,43 +21,18 @@ $gray-700: #464f58;
 $gray-800: #1f2933;
 $gray-900: #202020;
 
-// ORANGE COLORS
-$orange: #ff7f00;
-
 // RED COLORS
 $red: #ea5555;
 
 // TYPOGRAPHY
 
 $main-font-family: 'Poppins', sans-serif;
-$secondary-font-family: 'Manrope', sans-serif;
 $text-color: $gray-800;
 
 // UTILITIES
 
 $max-width: fn.pxToRem(1440);
-
 $header-height: fn.pxToRem(80);
-
-// PLACEHOLDERS SELECTOR
-
-%flex-column {
-  display: flex;
-  flex-direction: column;
-}
-
-%flex-column-centralize {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-%flex-row-centralize {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 // MEDIA-QUERY
 

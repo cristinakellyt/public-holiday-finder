@@ -11,6 +11,7 @@ type CountryInfo = Country & {
   officialName: string
   region: string
   isHolidayToday: boolean
+  isFavorite: boolean
   borders: CountryInfo[]
 }
 
