@@ -5,26 +5,28 @@
 </template>
 
 <script setup lang="ts">
-//Vue
-import { ref, watch } from 'vue'
+// Vue
+import { ref, watch } from 'vue';
 
 const props = defineProps({
   countryCode: {
     type: String,
     required: true,
   },
-})
+});
 
-const svgComponent = ref<string>()
+// Import all SVGs with import.meta.glob
+const svgComponent = ref<string | undefined>();
+
 
 watch(
   () => props.countryCode,
   (newValue) => {
-    const filePath = `/src/assets/countries/${newValue.toLowerCase()}.svg`
-    svgComponent.value = filePath
+    const filePath = `/countries/${newValue.toLowerCase()}.svg`;
+    svgComponent.value = filePath;
   },
   { immediate: true },
-)
+);
 </script>
 
 <style scoped lang="scss">
