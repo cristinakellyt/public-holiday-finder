@@ -1,5 +1,5 @@
 <template>
-  <div class="last-searched-country-section-wrapper" v-if="!loadingStatus && !errorStatus">
+  <div class="last-searched-country-section-wrapper" v-if="!errorStatus">
     <!-- Title -->
     <h2 class="section-title">
       Check out the information of the last searched country:
@@ -19,17 +19,19 @@
 
       <!-- Holiday Table -->
       <div class="content-bottom">
-        <CountryHolidayTable />
+        <CountryHolidayTable v-if="lastCountrySearched.holidays.length > 0" />
+        <!-- Error Status for when no holidays were found -->
+        <p class="error-status" v-else>No holidays found for this country.</p>
       </div>
     </div>
+    <!-- Loading Status -->
+    <div v-if="loadingStatus && !errorStatus">
+      <BaseSpinner :isLoading="true" />
+    </div>
   </div>
-  <!-- Error Status -->
+  <!-- Error Status for when the API has an error -->
   <div class="error-status" v-else-if="errorStatus">
     <p>Error fetching data, please try again later.</p>
-  </div>
-  <!-- Loading Status -->
-  <div class="loading-status" v-else>
-    <p>Loading...</p>
   </div>
 </template>
 
@@ -51,6 +53,7 @@ const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCoun
   margin-top: pxToRem(20);
   width: 100%;
   height: auto;
+  position: relative;
 
   .section-title {
     @include flex-gap(row, pxToRem(10), center, center);
@@ -81,7 +84,9 @@ const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCoun
   height: auto;
 }
 
-// .content-right {
-//   width: 50%;
-// }
+.error-status {
+  color: $red;
+  font-size: pxToRem(16);
+  font-weight: 500;
+}
 </style>

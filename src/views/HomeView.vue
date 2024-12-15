@@ -7,11 +7,18 @@
         @onCountrySelected="onCountrySelected"
         :selected-country="lastCountrySearched.name"
       />
-      <p class="error-message" v-if="availableCountries.length === 0">
+      <!-- Error Message for when there are no countries available or if the last country searched is not available -->
+      <p
+        class="error-message"
+        v-if="(availableCountries.length === 0 && !loadingStatus) || errorStatus"
+      >
         Sorry, we are experiencing issues, please try again later.
       </p>
+      <!-- Loading Status -->
+      <BaseSpinner :isLoading="firstLoad && loadingStatus" />
+      <!-- Country Detail Section -->
       <CountryDetailSection
-        v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays.length > 0"
+        v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays"
       />
       <TableHolidaysWorldwide />
     </BaseWidth>
@@ -21,7 +28,7 @@
 <script setup lang="ts">
 //Vue
 import { storeToRefs } from 'pinia'
-import { computed } from 'vue'
+import { computed, watch, ref } from 'vue'
 //Components
 import SearchCountry from '@/components/SearchCountry.vue'
 import TableHolidaysWorldwide from '@/components/TableHolidaysWorldwide.vue'
@@ -34,10 +41,11 @@ import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 const publicHolidaysStore = usePublicHolidaysStore()
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 
-const { lastCountrySearched } = storeToRefs(lastCountrySearchedStore)
+const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCountrySearchedStore)
 const { availableCountries } = storeToRefs(publicHolidaysStore)
 
 const getCountriesNames = computed(() => availableCountries.value.map((country) => country.name))
+const firstLoad = ref<boolean>(true)
 
 // Find country code selected in the map and set it in the store
 const onCountrySelected = async (countryName: string) => {
@@ -48,6 +56,12 @@ const onCountrySelected = async (countryName: string) => {
     await lastCountrySearchedStore.setLastCountrySearched(countryCode)
   }
 }
+
+// When the lastCountrySearched is filled, set the firstLoad to false
+// This is used to show the spinner while the lastCountrySearched is filled for the first time
+watch(lastCountrySearched, () => {
+  firstLoad.value = false
+})
 </script>
 
 <style scoped lang="scss">
