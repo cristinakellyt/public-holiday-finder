@@ -15,6 +15,7 @@ This project is a public holiday finder. It allows you to find public holidays a
 - View holidays by year or upcoming holidays.
 - Sort holidays by name or date.
 - Save favorite countries for quick access at favorites page (accessible from the header).
+- Toast notifications for when a country is added to favorites or removed from favorites.
 - See a quick information about the application in a modal accessible from the header.
 - Responsive design for mobile devices.
 
