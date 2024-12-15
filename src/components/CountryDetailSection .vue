@@ -50,6 +50,9 @@ import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useFavoritesCountriesStore } from '@/stores/favoritesCountriesStore'
 //Types
 import type { CountryInfo as TypeCountryInfo } from '@/types/country'
+import { ToastType, ToastPosition } from '@/types/toast'
+//Utils
+import { toastManager } from '@/utils/ToastManager'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 const publicHolidaysStore = usePublicHolidaysStore()
@@ -73,10 +76,21 @@ const updateCountryData = async (countryCode: string) => {
 }
 
 const toggleFavoriteCountry = (isFavorite: boolean, countryCode: string) => {
+  const countryName = lastCountrySearched.value.name
   if (isFavorite) {
     favoritesCountriesStore.addFavoriteCountry(countryCode)
+    toastManager.addToast(
+      `${countryName} added to favorites`,
+      ToastType.INFO,
+      ToastPosition.TOP_CENTER,
+    )
   } else {
     favoritesCountriesStore.removeFavoriteCountry(countryCode)
+    toastManager.addToast(
+      `${countryName} removed from favorites`,
+      ToastType.INFO,
+      ToastPosition.TOP_CENTER,
+    )
   }
   updateCountryData(countryCode)
 }

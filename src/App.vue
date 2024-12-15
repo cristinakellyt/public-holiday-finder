@@ -3,6 +3,7 @@
   <div class="main-content">
     <RouterView />
   </div>
+  <BaseToast />
 </template>
 
 <script setup lang="ts">
@@ -10,11 +11,13 @@
 import { onMounted } from 'vue'
 //Components
 import TheHeader from '@/components/layout/TheHeader.vue'
+import BaseToast from '@/components/BasicComponents/BaseToast.vue'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
 import { useCountryFlagStore } from '@/stores/countryFlagStore'
+//Utils
 import { devLog } from '@/utils/logger'
 
 const publicHolidaysStore = usePublicHolidaysStore()
@@ -31,7 +34,7 @@ onMounted(async () => {
     wikipediaLinksStore.loadWikipediaLinks()
     countryFlagStore.loadCountryFlag()
   } catch (error) {
-    devLog("Error at start-up: ", error)
+    devLog('Error at start-up: ', error)
   }
 })
 </script>

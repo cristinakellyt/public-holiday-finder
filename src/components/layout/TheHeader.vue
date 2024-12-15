@@ -34,12 +34,10 @@
 <script setup lang="ts">
 //Vue
 import { ref } from 'vue'
-//Vue Router
 import { useRouter } from 'vue-router'
 //Icons
 import icCalendar from '@/assets/icons/ic_calendar.svg'
-import AnimationTransition from '../BasicComponents/AnimationTransition.vue'
-import InfoModal from '../InfoModal.vue'
+import InfoModal from '@/components/InfoModal.vue'
 //Components
 const router = useRouter()
 
