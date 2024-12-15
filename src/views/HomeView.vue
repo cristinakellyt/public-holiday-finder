@@ -3,6 +3,7 @@
     <BaseWidth>
       <SearchCountry />
       <MapComponent
+        class="display-map"
         :clickable-countries="getCountriesNames"
         @onCountrySelected="onCountrySelected"
         :selected-country="lastCountrySearched.name"
@@ -69,5 +70,11 @@ watch(lastCountrySearched, () => {
   text-align: center;
   margin-top: pxToRem(20);
   color: $red;
+}
+
+@include media-query($tablet) {
+  .display-map {
+    display: none;
+  }
 }
 </style>

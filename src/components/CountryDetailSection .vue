@@ -2,8 +2,7 @@
   <div class="last-searched-country-section-wrapper" v-if="!errorStatus">
     <!-- Title -->
     <h2 class="section-title">
-      Check out the information of the last searched country:
-      <span class="country-name">{{ lastCountrySearched.name }}</span>
+      <span class="country-name">Details about {{ lastCountrySearched.name }}</span>
       <img
         v-if="lastCountrySearched.flagUrl"
         :src="lastCountrySearched.flagUrl"
@@ -56,18 +55,18 @@ const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCoun
   position: relative;
 
   .section-title {
-    @include flex-gap(row, pxToRem(10), center, center);
-    font-size: pxToRem(24);
+    @include flex-direction-align-justify(row, pxToRem(10), center, center);
     font-weight: 500;
 
     .country-name {
       color: $color-primary-2;
+      font-size: inherit;
     }
   }
 }
 
 .content-wrapper {
-  @include flex-gap(column, pxToRem(50), center, center);
+  @include flex-direction-align-justify(column, pxToRem(50), center, center);
   width: 100%;
   margin: pxToRem(20) 0 pxToRem(30) 0;
 
@@ -88,5 +87,11 @@ const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCoun
   color: $red;
   font-size: pxToRem(16);
   font-weight: 500;
+}
+
+@include media-query($tablet) {
+  .content-wrapper {
+    margin: pxToRem(15) 0 pxToRem(15) 0;
+  }
 }
 </style>

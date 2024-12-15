@@ -10,4 +10,10 @@
   margin: 0 auto;
   padding: pxToRem(32);
 }
+
+@include media-query($mobile-large) {
+  .base-width {
+    padding: pxToRem(16);
+  }
+}
 </style>

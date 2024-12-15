@@ -90,7 +90,6 @@ watch(
   justify-content: end;
   align-items: center;
   gap: pxToRem(10);
-  font-size: pxToRem(14);
   font-weight: 500;
   width: 100%;
 

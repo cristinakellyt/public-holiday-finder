@@ -11,7 +11,7 @@
       </template>
       <!-- Holiday Name -->
       <template #name="{ rowData }">
-        <div class="centralized-container" role="link">
+        <div role="link">
           <!-- If wikipedia link is not empty, we can click on the name and it will redirect to the wikipedia page -->
           <a
             v-if="rowData.wikipediaLink"
@@ -19,14 +19,15 @@
             :class="{ link: rowData.wikipediaLink }"
             :href="rowData.wikipediaLink"
             target="_blank"
-            >{{ rowData.name }}</a
-          >
-          <img
-            v-if="rowData.wikipediaLink"
-            :src="icRedirectLink"
-            alt="redirect-link"
-            class="redirect-link"
-          />
+            >{{ rowData.name }}
+
+            <img
+              v-if="rowData.wikipediaLink"
+              :src="icRedirectLink"
+              alt="redirect-link"
+              class="redirect-icon"
+            />
+          </a>
           <span v-else class="name">{{ rowData.name }}</span>
         </div>
       </template>
@@ -91,7 +92,6 @@ const getPaginatedData = () => {
   const startIndex = (currentPage.value - 1) * pageSize.value
   const endIndex = startIndex + pageSize.value
   tablePaginatedData.value = tableData.value?.slice(startIndex, endIndex) ?? []
-  // TODO: add empty rows in BaseTable
 }
 </script>
 
@@ -100,7 +100,6 @@ const getPaginatedData = () => {
   width: 100%;
 
   .title {
-    font-size: pxToRem(22);
     font-weight: 500;
   }
 }
@@ -118,12 +117,24 @@ const getPaginatedData = () => {
 }
 
 .centralized-container {
-  @include flex-gap(row, pxToRem(10), center, flex-start);
+  @include flex-direction-align-justify(row, pxToRem(10), center, flex-start);
+
+  span {
+    text-align: center;
+  }
 }
 
-.redirect-link {
-  width: pxToRem(16);
-  height: pxToRem(16);
+.redirect-icon {
+  width: pxToRem(14);
+  height: pxToRem(14);
   cursor: pointer;
+  margin-left: pxToRem(5);
+  margin-bottom: pxToRem(2);
+}
+
+@include media-query($mobile-large) {
+  .centralized-container {
+    @include flex-direction-align-justify(column, pxToRem(10), center, center);
+  }
 }
 </style>

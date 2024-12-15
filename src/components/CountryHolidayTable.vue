@@ -6,19 +6,21 @@
         <h2 class="title">
           <span
             v-if="
-              (!countryHolidaysByYear && filterYear?.toString().length !== 4) ||
+              (!countryHolidaysByYear && filterYear?.toString().length !== YEAR_CARACHTERS) ||
               fetchHolidayByYearError
             "
           >
             Next
           </span>
-          Public Holidays in {{ lastCountrySearched.name }}
-          <img
-            v-if="lastCountrySearched.flagUrl"
-            :src="lastCountrySearched.flagUrl"
-            alt="country-flag"
-          />
-          <span v-if="countryHolidaysByYear && filterYear?.toString().length === 4">
+          <span class="title-flag">
+            Public Holidays in {{ lastCountrySearched.name }}
+            <img
+              v-if="lastCountrySearched.flagUrl"
+              :src="lastCountrySearched.flagUrl"
+              alt="country-flag"
+            />
+          </span>
+          <span v-if="countryHolidaysByYear && filterYear?.toString().length === YEAR_CARACHTERS">
             in {{ filterYear }}
           </span>
         </h2>
@@ -41,7 +43,7 @@
       </template>
       <!-- Holiday Name -->
       <template #name="{ rowData }">
-        <div class="centralized-container">
+        <div>
           <!-- If wikipedia link is not empty, we can click on the name and it will redirect to the wikipedia page -->
           <a
             v-if="rowData.wikipediaLink"
@@ -49,14 +51,15 @@
             :class="{ link: rowData.wikipediaLink }"
             :href="rowData.wikipediaLink"
             target="_blank"
-            >{{ rowData.name }}</a
-          >
-          <img
-            v-if="rowData.wikipediaLink"
-            :src="icRedirectLink"
-            alt="redirect-link"
-            class="redirect-link"
-          />
+            >{{ rowData.name }}
+
+            <img
+              v-if="rowData.wikipediaLink"
+              :src="icRedirectLink"
+              alt="redirect-link"
+              class="redirect-icon"
+            />
+          </a>
           <span v-else class="name">{{ rowData.name }}</span>
         </div>
       </template>
@@ -123,6 +126,7 @@ const countryHolidaysByYear = ref<PublicHoliday[] | null>(null)
 const tableData = ref<PublicHoliday[]>([])
 
 const filterYear = ref<number | null>(null)
+const YEAR_CARACHTERS = 4
 const fetchHolidayByYearError = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(5)
@@ -234,7 +238,7 @@ const handleFilterYear = async (inputValue: string) => {
     return
   }
 
-  if (filterYear.value.toString().length > 4) {
+  if (filterYear.value.toString().length > YEAR_CARACHTERS) {
     countryHolidaysByYear.value = null
     fetchHolidayByYearError.value = true
     updatePage(1)
@@ -242,7 +246,7 @@ const handleFilterYear = async (inputValue: string) => {
   }
 
   //If filterYear is not a 4 digit number, set errorFilterYear to true
-  if (filterYear.value.toString().length === 4) {
+  if (filterYear.value.toString().length === YEAR_CARACHTERS) {
     countryHolidaysByYear.value = await publicHolidaysStore.getPublicHolidaysByYear(
       filterYear.value,
       lastCountrySearched.value.countryCode,
@@ -264,15 +268,12 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .title {
-  @include flex-gap(row, pxToRem(10), center, center);
-  font-size: pxToRem(22);
+  @include flex-direction-align-justify(row, pxToRem(10), center, center);
   font-weight: 500;
-}
 
-.subtitle {
-  font-size: pxToRem(12);
-  color: $pure-white;
-  font-weight: 500;
+  .title-flag {
+    @include flex-direction-align-justify(row, pxToRem(5), center, center);
+  }
 }
 
 .name {
@@ -287,14 +288,12 @@ onMounted(() => {
   }
 }
 
-.centralized-container {
-  @include flex-gap(row, pxToRem(10), center, flex-start);
-}
-
-.redirect-link {
-  width: pxToRem(16);
-  height: pxToRem(16);
+.redirect-icon {
+  width: pxToRem(14);
+  height: pxToRem(14);
   cursor: pointer;
+  margin-left: pxToRem(5);
+  margin-bottom: pxToRem(2);
 }
 
 :deep(.base-table) {
@@ -314,7 +313,7 @@ onMounted(() => {
 .bottom-table-wrapper {
   width: 100%;
   height: auto;
-  @include flex-gap(row, pxToRem(10), center, space-between);
+  @include flex-direction-align-justify(row, pxToRem(10), center, space-between);
 
   .filter-by-year-wrapper {
     max-width: pxToRem(250);
@@ -324,6 +323,26 @@ onMounted(() => {
     color: $red;
     font-size: pxToRem(12);
     font-weight: 500;
+  }
+}
+
+@include media-query($tablet) {
+  .bottom-table-wrapper {
+    @include flex-direction-align-justify(column, 0, start, center);
+  }
+
+  .title {
+    @include flex-direction-align-justify(column, 0, center, center);
+  }
+}
+
+@include media-query($mobile-large) {
+  .bottom-table-wrapper {
+    @include flex-direction-align-justify(column, pxToRem(15), start, center);
+  }
+
+  .centralized-container {
+    @include flex-direction-align-justify(column, pxToRem(10), center, center);
   }
 }
 </style>

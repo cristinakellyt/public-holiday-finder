@@ -19,9 +19,15 @@
 
 <style scoped lang="scss">
 .header-wrapper {
+  position: fixed; // Make the header fixed
+  top: 0; // Position it at the top
+  left: 0; // Align it to the left
+  right: 0; // Align it to the right
+  z-index: 1000; // Ensure it stays above other content
   background-color: $color-primary;
   border-bottom: pxToRem(1) solid $green-1;
-  box-shadow: 1px -1px 8px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: pxToRem(1) pxToRem(-1) pxToRem(8) 0 rgba(0, 0, 0, 0.1);
+  height: $header-height;
 
   :deep(.base-width) {
     padding: pxToRem(16) pxToRem(32);
@@ -33,7 +39,6 @@
     align-items: center;
 
     .header-title {
-      font-size: pxToRem(28);
       font-weight: 500;
       color: $pure-white;
     }

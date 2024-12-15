@@ -20,18 +20,18 @@
       <CountryMap class="map-wrapper" :country-code="lastCountrySearched.countryCode" />
       <div class="content-info">
         <!-- Country Info -->
-        <div class="info-text">
+        <div>
           <span class="bold">Official Name: </span>
           <span class="country-info-official-name">{{ countryInfo.officialName }}</span>
         </div>
-        <p class="bold info-text">
+        <p class="bold">
           {{ getTextForTodayIsHoliday }}
         </p>
-        <div class="info-text">
+        <div>
           <span class="bold">Region: </span>
           <span class="country-info-region">{{ countryInfo.region }}</span>
         </div>
-        <div class="info-text">
+        <div>
           <span class="bold">This country has {{ getTextForBorders }}</span>
           <!-- Show only if there are borders -->
           <div class="border-info-wrapper" v-if="countryInfo.borders.length > 0">
@@ -82,7 +82,7 @@ onMounted(async () => {
   )
 })
 
-//watch lastCountrySearched
+//watch lastCountrySearched and update countryInfo
 watch(lastCountrySearched, async () => {
   countryInfo.value = await publicHolidaysStore.getCountryInfo(
     lastCountrySearched.value.countryCode,
@@ -125,9 +125,7 @@ const getTextForTodayIsHoliday = computed(() => {
 
 <style scoped lang="scss">
 .country-info-wrapper {
-  //   width: 80%;
-  //   margin: 0 auto;
-  @include flex-gap(column, pxToRem(10), flex-start, flex-start);
+  @include flex-direction-align-justify(column, pxToRem(10), flex-start, flex-start);
   background-color: $green-1;
   padding: pxToRem(10);
   border-radius: pxToRem(10);
@@ -139,27 +137,23 @@ const getTextForTodayIsHoliday = computed(() => {
   }
 
   .content-wrapper {
-    @include flex-gap(row, pxToRem(10), flex-start, space-between);
+    @include flex-direction-align-justify(row, pxToRem(10), flex-start, space-between);
     width: 100%;
     height: auto;
   }
 
   .content-info {
-    @include flex-gap(column, pxToRem(10), flex-start, flex-start);
+    @include flex-direction-align-justify(column, pxToRem(10), flex-start, flex-start);
     width: 100%;
     height: auto;
   }
-}
-
-.info-text {
-  font-size: pxToRem(16);
 }
 .bold {
   font-weight: 500;
 }
 
 .border-info-wrapper {
-  @include flex-gap(row, pxToRem(10), flex-start, flex-start);
+  @include flex-direction-align-justify(row, pxToRem(10), flex-start, flex-start);
   flex-wrap: wrap;
   margin-top: pxToRem(10);
 }
@@ -169,7 +163,7 @@ const getTextForTodayIsHoliday = computed(() => {
   padding: pxToRem(5);
   border-radius: pxToRem(5);
   box-shadow: 1px 1px 0 0 $color-primary-2;
-  @include flex-gap(row, pxToRem(5), center, flex-start);
+  @include flex-direction-align-justify(row, pxToRem(5), center, flex-start);
   width: max-content;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -192,5 +186,17 @@ const getTextForTodayIsHoliday = computed(() => {
   cursor: pointer;
   margin-left: auto;
   margin-right: pxToRem(10);
+}
+
+@include media-query($tablet) {
+  .country-info-wrapper {
+    .content-wrapper {
+      @include flex-direction-align-justify(column, pxToRem(16), center, center);
+    }
+
+    .content-info {
+      width: auto;
+    }
+  }
 }
 </style>

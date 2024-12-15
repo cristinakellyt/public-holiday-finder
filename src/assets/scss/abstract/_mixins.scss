@@ -1,10 +1,15 @@
 @mixin media-query($size) {
-  @media (min-width: $size) {
+  @media (max-width: $size) {
     @content;
   }
 }
 
-@mixin flex-gap($direction, $gap, $align-items: center, $justify-content: center) {
+@mixin flex-direction-align-justify(
+  $direction,
+  $gap,
+  $align-items: center,
+  $justify-content: center
+) {
   display: flex;
   flex-direction: $direction;
   gap: $gap;
