@@ -40,13 +40,18 @@
 </template>
 
 <script setup lang="ts">
+import type {PropType} from 'vue'
+
 defineProps({
   options: {
-    type: Object,
+    type: Object as PropType<{
+      headings: Record<string, string>;
+      sortable?: string[];
+    }>,
     required: true,
   },
   tableData: {
-    type: Array,
+    type: Array as PropType<{ id: string | number;}[]>,
     required: true,
   },
 })
