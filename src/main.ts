@@ -13,6 +13,7 @@ import BaseInput from '@/components/BasicComponents/BaseInput.vue'
 import BaseSpinner from '@/components/BasicComponents/BaseSpinner.vue'
 import BaseButton from '@/components/BasicComponents/BaseButton.vue'
 import BaseModal from '@/components/BasicComponents/BaseModal.vue'
+import AnimationTransition from '@/components/BasicComponents/AnimationTransition.vue'
 
 const app = createApp(App)
 
@@ -23,7 +24,7 @@ app.component('BaseInput', BaseInput)
 app.component('BaseSpinner', BaseSpinner)
 app.component('BaseButton', BaseButton)
 app.component('BaseModal', BaseModal)
-
+app.component('AnimationTransition', AnimationTransition)
 app.use(createPinia())
 app.use(router)
 
