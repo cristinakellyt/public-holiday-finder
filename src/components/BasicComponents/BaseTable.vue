@@ -79,7 +79,6 @@ const emitSort = (column: string) => {
   border-top-right-radius: pxToRem(10);
 }
 
-/* table styling */
 .base-table {
   width: 100%;
   border-collapse: separate;
@@ -89,7 +88,6 @@ const emitSort = (column: string) => {
 .head-base-table {
   font-weight: 700;
   color: $color-primary-2;
-  font-size: pxToRem(16);
   letter-spacing: 0;
   line-height: pxToRem(16);
   height: pxToRem(40);
@@ -118,7 +116,7 @@ const emitSort = (column: string) => {
 
   .cell-base-table {
     background-color: $pure-white;
-    padding: pxToRem(18) pxToRem(16);
+    padding: pxToRem(18) pxToRem(5);
     border-bottom: pxToRem(1) solid $gray-200;
     font-weight: 500;
 
@@ -143,6 +141,7 @@ const emitSort = (column: string) => {
 }
 
 .sort-icon {
-  font-size: pxToRem(14);
+  width: pxToRem(14);
+  height: pxToRem(14);
 }
 </style>

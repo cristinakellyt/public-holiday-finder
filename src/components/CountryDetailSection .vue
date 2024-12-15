@@ -1,9 +1,8 @@
 <template>
-  <div class="last-searched-country-section-wrapper" v-if="!loadingStatus && !errorStatus">
+  <div class="last-searched-country-section-wrapper" v-if="!errorStatus">
     <!-- Title -->
     <h2 class="section-title">
-      Check out the information of the last searched country:
-      <span class="country-name">{{ lastCountrySearched.name }}</span>
+      <span class="country-name">Details about {{ lastCountrySearched.name }}</span>
       <img
         v-if="lastCountrySearched.flagUrl"
         :src="lastCountrySearched.flagUrl"
@@ -19,17 +18,19 @@
 
       <!-- Holiday Table -->
       <div class="content-bottom">
-        <CountryHolidayTable />
+        <CountryHolidayTable v-if="lastCountrySearched.holidays.length > 0" />
+        <!-- Error Status for when no holidays were found -->
+        <p class="error-status" v-else>No holidays found for this country.</p>
       </div>
     </div>
+    <!-- Loading Status -->
+    <div v-if="loadingStatus && !errorStatus">
+      <BaseSpinner :isLoading="true" />
+    </div>
   </div>
-  <!-- Error Status -->
+  <!-- Error Status for when the API has an error -->
   <div class="error-status" v-else-if="errorStatus">
     <p>Error fetching data, please try again later.</p>
-  </div>
-  <!-- Loading Status -->
-  <div class="loading-status" v-else>
-    <p>Loading...</p>
   </div>
 </template>
 
@@ -51,20 +52,21 @@ const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCoun
   margin-top: pxToRem(20);
   width: 100%;
   height: auto;
+  position: relative;
 
   .section-title {
-    @include flex-gap(row, pxToRem(10), center, center);
-    font-size: pxToRem(24);
+    @include flex-direction-align-justify(row, pxToRem(10), center, center);
     font-weight: 500;
 
     .country-name {
       color: $color-primary-2;
+      font-size: inherit;
     }
   }
 }
 
 .content-wrapper {
-  @include flex-gap(column, pxToRem(50), center, center);
+  @include flex-direction-align-justify(column, pxToRem(50), center, center);
   width: 100%;
   margin: pxToRem(20) 0 pxToRem(30) 0;
 
@@ -81,7 +83,15 @@ const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCoun
   height: auto;
 }
 
-// .content-right {
-//   width: 50%;
-// }
+.error-status {
+  color: $red;
+  font-size: pxToRem(16);
+  font-weight: 500;
+}
+
+@include media-query($tablet) {
+  .content-wrapper {
+    margin: pxToRem(15) 0 pxToRem(15) 0;
+  }
+}
 </style>

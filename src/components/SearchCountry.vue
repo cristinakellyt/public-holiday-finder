@@ -91,7 +91,7 @@ const handleEnter = () => {
 .search-country-wrapper {
   position: relative;
   max-width: pxToRem(600);
-  margin: 0 auto;
+  margin: 0 auto pxToRem(16) auto;
 }
 
 .backdrop {

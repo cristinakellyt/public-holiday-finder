@@ -2383,7 +2383,7 @@ const emit = defineEmits(['onCountrySelected'])
 const currentlySelected = ref<string | null>(props.selectedCountry)
 const tooltip = ref<HTMLElement>()
 
-//watch selectedCountry
+//watch selectedCountry and update currentlySelected through handleClick
 watch(
   () => props.selectedCountry,
   (newVal) => {

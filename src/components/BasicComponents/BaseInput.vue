@@ -139,7 +139,7 @@ watch(inputValue, (newValue) => {
 
 <style scoped lang="scss">
 .input-wrapper {
-  @include flex-gap(row, pxToRem(15), center, flex-start);
+  @include flex-direction-align-justify(row, pxToRem(15), center, flex-start);
   position: relative;
   width: 100%;
 

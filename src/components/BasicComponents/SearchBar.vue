@@ -86,7 +86,7 @@ watch(
   width: 100%;
   background-color: transparent;
   position: relative;
-  border-bottom: pxToRem(1) solid $gray-300;
+  border-bottom: pxToRem(1.5) solid $gray-300;
   transition: border-bottom 0.3s ease;
 
   & .search-input:focus {
@@ -94,7 +94,7 @@ watch(
   }
 
   &:focus-within {
-    border-bottom: pxToRem(1) solid $color-primary;
+    border-bottom: pxToRem(1.5) solid $color-primary;
   }
 }
 

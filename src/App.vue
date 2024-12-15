@@ -1,6 +1,8 @@
 <template>
   <TheHeader />
-  <RouterView />
+  <div class="main-content">
+    <RouterView />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -34,4 +36,8 @@ onMounted(async () => {
 })
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.main-content {
+  margin-top: $header-height;
+}
+</style>
