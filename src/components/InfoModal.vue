@@ -4,21 +4,25 @@
       <h2>Welcome to Public Holidays Finder!</h2>
     </template>
     <template #text>
-      <p>
-        This app allows you to find public holidays for any country available in our database.
-        <br /><br />
-        <span class="bold">Features:</span>
+      <div>
+        <p>
+          This app allows you to find public holidays for any country available in our database.
+        </p>
+        <br />
+        <p class="bold">This is what you can do:</p>
         <ul>
           <li class="highlight bold">- Discover public holidays by country.</li>
-          <li class="highlight bold">- Access details about each holiday, through links to Wikipedia.</li>
+          <li class="highlight bold">
+            - Access details about each holiday, through links to Wikipedia.
+          </li>
           <li class="highlight bold">- View holidays by year or upcoming holidays.</li>
           <li class="highlight bold">- Save favorite countries for quick access.</li>
         </ul>
         <br />
-        To get started, use the search bar to find a country, and explore its public holidays!
-        <br /><br />
-        Enjoy your journey through the world of public holidays!
-      </p>
+        <p>To get started, choose a country, and explore it!</p>
+        <br />
+        <p>Enjoy your journey through the world of public holidays!</p>
+      </div>
     </template>
     <template #buttons>
       <BaseButton class="button-close" @click="closeModal" text="Close" size="medium" />
@@ -27,7 +31,6 @@
 </template>
 
 <script setup lang="ts">
-
 const emit = defineEmits(['close'])
 
 const closeModal = () => {

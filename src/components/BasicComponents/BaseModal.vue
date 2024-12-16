@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="base-modal">
     <div class="backdrop" @click="close"></div>
 
     <div class="modal">
@@ -35,6 +35,15 @@ const close = () => {
 </script>
 
 <style scoped lang="scss">
+.base-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1000;
+}
+
 .backdrop {
   position: fixed;
   top: 0;
