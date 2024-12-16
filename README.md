@@ -32,12 +32,12 @@ This project is a public holiday finder. It allows you to find public holidays a
 
 - Basic components: Can be reused accross the application. They are located in the `src/components/BasicComponents` folder.
 - Components: Building blocks of the application, generally built with the basic components. They are located in the `src/components` folder.
-- Layouts: Layouts are the structure of the application. They are located in the `src/layouts` folder.
-- Views: Views are the pages view of the application. They are located in the `src/views` folder.
-- Routes: Routes are the classes that handle the data routes. They are located in the `src/routes` folder.
-- Stores: Stores are the classes that handle the data storage and retrieval. They are located in the `src/stores` folder. To avoid unnecessary requests to the API, a cache mechanism is implemented, always saving the already accessed data `in memory` and `local storage`.
-- Utils: Utils are the classes that handle the data formatting and validation. They are located in the `src/utils` folder.
-- Types: Types are the classes that handle the data types. They are located in the `src/types` folder.
+- Layouts: Layouts are the structure of the application. They are located in the `src/components/layout` folder.
+- Views: Are the pages view of the application. They are located in the `src/views` folder.
+- Routes: Are the available routes of the application. They are located in the `src/router` folder.
+- Stores: Used to manage the data state across the application with **Pinia**. They are located in the `src/stores` folder. To avoid unnecessary requests to the API, a cache mechanism is implemented, always saving the already accessed data `in memory` and `local storage`.
+- Utils: Are the utility functions/classes that the application uses. They are located in the `src/utils` folder.
+- Types: Are the types used in the application. They are located in the `src/types` folder.
 
 ## Google Lighthouse testing
 
