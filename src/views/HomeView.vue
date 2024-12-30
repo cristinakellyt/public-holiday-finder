@@ -4,7 +4,7 @@
       <SearchCountry />
       <MapComponent
         class="display-map"
-        :clickable-countries="getCountriesNames"
+        :clickable-countries="availableCountriesNames"
         @onCountrySelected="onCountrySelected"
         :selected-country="lastCountrySearched.name"
       />
@@ -21,6 +21,7 @@
       <CountryDetailSection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays"
       />
+      <!-- Table of Holidays Worldwide -->
       <TableHolidaysWorldwide />
     </BaseWidth>
   </main>
@@ -45,7 +46,9 @@ const lastCountrySearchedStore = useLastCountrySearchedStore()
 const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCountrySearchedStore)
 const { availableCountries } = storeToRefs(publicHolidaysStore)
 
-const getCountriesNames = computed(() => availableCountries.value.map((country) => country.name))
+const availableCountriesNames = computed(() =>
+  availableCountries.value.map((country) => country.name),
+)
 const firstLoad = ref<boolean>(true)
 
 // Find country code selected in the map and set it in the store

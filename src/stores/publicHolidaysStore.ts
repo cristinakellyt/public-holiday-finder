@@ -3,10 +3,12 @@ import { ref } from 'vue'
 import type { Country, CountryInfo } from '@/types/country'
 import type { PublicHoliday } from '@/types/publicHolidays'
 //Stores
-import { useCountryFlagStore } from '@/stores/countryFlagStore'
-import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
 import { useFavoritesCountriesStore } from '@/stores/favoritesCountriesStore'
+//Utils
 import { devLog } from '@/utils/logger'
+//Composables
+import { useCountryFlag } from '@/composables/countryFlag'
+import { useWikipediaLinks } from '@/composables/wikipediaLinks'
 
 const CONFIG = {
   API_URL: 'https://date.nager.at/api/v3/',
@@ -24,8 +26,8 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   const favoritesCountriesStore = useFavoritesCountriesStore()
   const { favoritesCountries } = storeToRefs(favoritesCountriesStore)
 
-  const countryFlagStore = useCountryFlagStore()
-  const wikipediaLinksStore = useWikipediaLinksStore()
+  const { getCountryFlag } = useCountryFlag()
+  const { getWikipediaLink } = useWikipediaLinks()
 
   const getAvailableCountries = async () => {
     // Return data if already fetched, avoid fetching again
@@ -55,7 +57,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       // Add Flags
       await Promise.all(
         data.map(async (holiday: PublicHoliday) => {
-          const flagUrl = await countryFlagStore.getCountryFlag(holiday.countryCode)
+          const flagUrl = await getCountryFlag(holiday.countryCode)
           holiday.flagUrl = flagUrl
         }),
       )
@@ -70,7 +72,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       // Add Wikipedia Link
       await Promise.all(
         data.map(async (holiday: PublicHoliday) => {
-          holiday.wikipediaLink = await wikipediaLinksStore.getWikipediaLink(holiday.name)
+          holiday.wikipediaLink = await getWikipediaLink(holiday.name)
         }),
       )
       publicHolidaysWorldwide.value = data
@@ -134,7 +136,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       // Add Wikipedia Link
       await Promise.all(
         data.map(async (holiday: PublicHoliday) => {
-          holiday.wikipediaLink = await wikipediaLinksStore.getWikipediaLink(holiday.name)
+          holiday.wikipediaLink = await getWikipediaLink(holiday.name)
         }),
       )
       publicHolidaysByYearMap.value[`${countryCode}-${year}`] = data
@@ -159,7 +161,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
         data.borders.map(async (border: CountryInfo) => {
           return {
             ...border,
-            flagUrl: await countryFlagStore.getCountryFlag(border.countryCode.toLowerCase()),
+            flagUrl: await getCountryFlag(border.countryCode.toLowerCase()),
           }
         }),
       )

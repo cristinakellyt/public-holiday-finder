@@ -5,14 +5,17 @@ import type { PublicHoliday } from '@/types/publicHolidays'
 import type { LastCountrySearched } from '@/types/country'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
-import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
-import { useCountryFlagStore } from '@/stores/countryFlagStore'
+//Composables
+import { useWikipediaLinks } from '@/composables/wikipediaLinks'
+import { useCountryFlag } from '@/composables/countryFlag'
 
 export const useLastCountrySearchedStore = defineStore('lastCountrySearched', () => {
   // Setup Stores
   const publicHolidaysStore = usePublicHolidaysStore()
-  const wikipediaLinksStore = useWikipediaLinksStore()
-  const countryFlagStore = useCountryFlagStore()
+
+  //Setup composables
+  const { getWikipediaLink } = useWikipediaLinks()
+  const { getCountryFlag } = useCountryFlag()
 
   // Setup internal and external states
   const lastCountrySearched = ref<LastCountrySearched>({
@@ -42,7 +45,7 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
     // No need to treat errors as the user doesn't reach this point if there is no available countries
     const name = await getCountryName(countryCode)
     // Even if the flag is not found, we want to show the country name
-    const flagUrl = await countryFlagStore.getCountryFlag(countryCode)
+    const flagUrl = await getCountryFlag(countryCode)
 
     const holidays = await getHolidays(countryCode)
     // If the holidays are not found, set the error status to true
@@ -78,7 +81,7 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
     await Promise.all(
       holidays.map(async (holiday: PublicHoliday) => {
         // Even if the wikipedia link is not found, we want to show the holiday name
-        holiday.wikipediaLink = await wikipediaLinksStore.getWikipediaLink(holiday.name)
+        holiday.wikipediaLink = await getWikipediaLink(holiday.name)
       }),
     )
     return holidays

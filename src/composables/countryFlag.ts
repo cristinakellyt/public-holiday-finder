@@ -11,7 +11,7 @@ type CountryFlag = {
   [key: string]: string
 }
 
-export const useCountryFlagStore = defineStore('countryFlag', () => {
+export function useCountryFlag() {
   const countriesFlagObj = ref<CountryFlag>({})
 
   const loadCountryFlag = () => {
@@ -31,7 +31,7 @@ export const useCountryFlagStore = defineStore('countryFlag', () => {
       localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(countriesFlagObj.value))
       return flagUrl
     } catch (error) {
-      devLog("Error while fetching country flag: ", error)
+      devLog('Error while fetching country flag: ', error)
       return null
     }
   }
@@ -47,4 +47,4 @@ export const useCountryFlagStore = defineStore('countryFlag', () => {
   }
 
   return { getCountryFlag, loadCountryFlag }
-})
+}
