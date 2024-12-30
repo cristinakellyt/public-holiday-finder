@@ -11,12 +11,17 @@
       <!-- Error Message for when there are no countries available or if the last country searched is not available -->
       <p
         class="error-message"
-        v-if="(availableCountries.length === 0 && !loadingStatus) || errorStatus"
+        v-if="
+          (availableCountries.length === 0 && !lastCountrySearchedLoadingStatus) ||
+          lastCountrySearchedErrorStatus
+        "
       >
         Sorry, we are experiencing issues, please try again later.
       </p>
       <!-- Loading Status -->
-      <BaseSpinner :isLoading="firstLoad && loadingStatus" />
+      <BaseSpinner
+        :isLoading="(firstLoad && lastCountrySearchedLoadingStatus) || publicHolidaysLoadingStatus"
+      />
       <!-- Country Detail Section -->
       <CountryDetailSection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays"
@@ -43,8 +48,13 @@ import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 const publicHolidaysStore = usePublicHolidaysStore()
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 
-const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCountrySearchedStore)
-const { availableCountries } = storeToRefs(publicHolidaysStore)
+const {
+  lastCountrySearched,
+  loadingStatus: lastCountrySearchedLoadingStatus,
+  errorStatus: lastCountrySearchedErrorStatus,
+} = storeToRefs(lastCountrySearchedStore)
+const { availableCountries, loadingStatus: publicHolidaysLoadingStatus } =
+  storeToRefs(publicHolidaysStore)
 
 const availableCountriesNames = computed(() =>
   availableCountries.value.map((country) => country.name),
