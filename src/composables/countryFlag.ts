@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { devLog } from '@/utils/logger'
+import { setItemWithExpiration, getItemWithExpiration } from '@/utils/localStorageWithExpiration'
 
 const CONFIG = {
   STORAGE_KEY: 'countryFlag',
@@ -14,10 +14,15 @@ type CountryFlag = {
 export function useCountryFlag() {
   const countriesFlagObj = ref<CountryFlag>({})
 
+  // Load the country flag from the local storage
+  onBeforeMount(() => {
+    loadCountryFlag()
+  })
+
   const loadCountryFlag = () => {
-    const countryFlagStored = localStorage.getItem(CONFIG.STORAGE_KEY)
-    if (countryFlagStored) {
-      countriesFlagObj.value = JSON.parse(countryFlagStored)
+    const countryFlagStored = getItemWithExpiration(CONFIG.STORAGE_KEY)
+    if (countryFlagStored !== null) {
+      countriesFlagObj.value = countryFlagStored
     }
   }
 
@@ -28,7 +33,7 @@ export function useCountryFlag() {
 
       const flagUrl = response.url
       countriesFlagObj.value[countryCode] = flagUrl
-      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(countriesFlagObj.value))
+      setItemWithExpiration(CONFIG.STORAGE_KEY, countriesFlagObj.value, 10000)
       return flagUrl
     } catch (error) {
       devLog('Error while fetching country flag: ', error)

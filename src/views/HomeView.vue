@@ -19,9 +19,7 @@
         Sorry, we are experiencing issues, please try again later.
       </p>
       <!-- Loading Status -->
-      <BaseSpinner
-        :isLoading="(firstLoad && lastCountrySearchedLoadingStatus) || publicHolidaysLoadingStatus"
-      />
+      <BaseSpinner :isLoading="firstLoad && lastCountrySearchedLoadingStatus" />
       <!-- Country Detail Section -->
       <CountryDetailSection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays"
@@ -53,8 +51,8 @@ const {
   loadingStatus: lastCountrySearchedLoadingStatus,
   errorStatus: lastCountrySearchedErrorStatus,
 } = storeToRefs(lastCountrySearchedStore)
-const { availableCountries, loadingStatus: publicHolidaysLoadingStatus } =
-  storeToRefs(publicHolidaysStore)
+
+const { availableCountries } = storeToRefs(publicHolidaysStore)
 
 const availableCountriesNames = computed(() =>
   availableCountries.value.map((country) => country.name),

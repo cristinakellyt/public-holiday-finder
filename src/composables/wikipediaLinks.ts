@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { devLog } from '@/utils/logger'
+import { setItemWithExpiration, getItemWithExpiration } from '@/utils/localStorageWithExpiration'
 
 type WikipediaLinks = {
   [key: string]: string
@@ -14,10 +14,15 @@ const CONFIG = {
 export function useWikipediaLinks() {
   const wikipediaLinks = ref<WikipediaLinks>({})
 
+  // Load the wikipedia links from the local storage
+  onBeforeMount(() => {
+    loadWikipediaLinks()
+  })
+
   const loadWikipediaLinks = () => {
-    const wikipediaLinksStored = localStorage.getItem(CONFIG.STORAGE_KEY)
-    if (wikipediaLinksStored) {
-      wikipediaLinks.value = JSON.parse(wikipediaLinksStored)
+    const wikipediaLinksStored = getItemWithExpiration(CONFIG.STORAGE_KEY)
+    if (wikipediaLinksStored !== null) {
+      wikipediaLinks.value = wikipediaLinksStored
     }
   }
 
@@ -46,7 +51,7 @@ export function useWikipediaLinks() {
       if (firstResult) {
         const wikiUrl = `https://en.wikipedia.org/wiki/${firstResult.title.replace(/ /g, '_')}`
         wikipediaLinks.value[holidayName] = wikiUrl
-        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(wikipediaLinks.value))
+        setItemWithExpiration(CONFIG.STORAGE_KEY, wikipediaLinks.value, 10000)
         return wikiUrl
       } else {
         devLog('No search results found for:', holidayName)

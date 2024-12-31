@@ -1,5 +1,11 @@
 <template>
-  <div class="table-holidays-worldwide" v-if="tableData !== null">
+  <!-- Loading Status -->
+  <BaseSpinner :isLoading="loadingStatus" />
+  <!-- Error Message -->
+  <p class="error-message" v-if="tableData === null">
+    Sorry, we are experiencing issues, please try again later.
+  </p>
+  <div class="table-holidays-worldwide" v-if="tableData !== null && tableData.length > 0">
     <BaseTable :options="tableOptions" :table-data="tablePaginatedData">
       <!-- Title -->
       <template #title>
@@ -52,7 +58,7 @@
 
 <script setup lang="ts">
 //Vue
-import { onMounted, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Utils
@@ -72,15 +78,17 @@ const tableOptions = {
   },
 }
 
-const tableData = ref<PublicHoliday[] | null>(null)
+const tableData = ref<PublicHoliday[] | null>([])
 const tablePaginatedData = ref<PublicHoliday[]>([])
 const currentPage = ref(1)
 const pageSize = ref(5)
+const loadingStatus = ref(true)
 
 //Fetch public holidays worldwide and fill data with flags and country name to display in table
-onMounted(async () => {
+onBeforeMount(async () => {
   tableData.value = await publicHolidaysStore.getPublicHolidaysWorldwide()
   getPaginatedData()
+  tableData.value !== null ? (loadingStatus.value = false) : (loadingStatus.value = true)
 })
 
 const updatePage = (page: number) => {
@@ -130,6 +138,12 @@ const getPaginatedData = () => {
   cursor: pointer;
   margin-left: pxToRem(5);
   margin-bottom: pxToRem(2);
+}
+
+.error-message {
+  text-align: center;
+  margin-top: pxToRem(20);
+  color: $red;
 }
 
 @include media-query($mobile-large) {
