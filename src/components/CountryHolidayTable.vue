@@ -104,6 +104,7 @@ import { storeToRefs } from 'pinia'
 //Types
 import type { TableOptions } from '@/types/tableOptions'
 import type { PublicHoliday } from '@/types/publicHolidays'
+import { ResultStatus } from '@/types/ApiResult'
 //Stores
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
@@ -247,16 +248,18 @@ const handleFilterYear = async (inputValue: string) => {
 
   //If filterYear is not a 4 digit number, set errorFilterYear to true
   if (filterYear.value.toString().length === YEAR_CARACHTERS) {
-    countryHolidaysByYear.value = await publicHolidaysStore.getPublicHolidaysByYear(
+    const result = await publicHolidaysStore.getPublicHolidaysByYear(
       filterYear.value,
       lastCountrySearched.value.countryCode,
     )
 
-    if (countryHolidaysByYear.value !== null) {
+    if (result.status === ResultStatus.SUCCESS) {
+      countryHolidaysByYear.value = result.data
       fetchHolidayByYearError.value = false
     } else {
       fetchHolidayByYearError.value = true
     }
+
     updatePage(1)
   }
 }

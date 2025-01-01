@@ -32,6 +32,7 @@ import { useFavoritesCountriesStore } from '@/stores/favoritesCountriesStore'
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Types
 import type { CountryInfo as TypeCountryInfo } from '@/types/country'
+import { ResultStatus } from '@/types/ApiResult'
 
 const favoritesCountriesStore = useFavoritesCountriesStore()
 const publicHolidaysStore = usePublicHolidaysStore()
@@ -40,8 +41,9 @@ const { favoritesCountries } = storeToRefs(favoritesCountriesStore)
 const countriesData = ref<TypeCountryInfo[]>([])
 
 const getCountryInfo = async (countryCode: string) => {
-  const countryData = await publicHolidaysStore.getCountryInfo(countryCode)
-  countriesData.value.push(countryData)
+  const countryInfoResult = await publicHolidaysStore.getCountryInfo(countryCode)
+  if (countryInfoResult.status === ResultStatus.ERROR) return
+  countriesData.value.push(countryInfoResult.data)
 }
 
 watch(favoritesCountries, async () => {

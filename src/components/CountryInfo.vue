@@ -59,6 +59,7 @@ import icFavoriteEmpty from '@/assets/icons/ic_favorite_empty.svg'
 import icFavoriteFullGreen from '@/assets/icons/ic_favorite_full_green.svg'
 //Types
 import type { CountryInfo } from '@/types/country'
+import { ResultStatus } from '@/types/ApiResult'
 
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 const publicHolidaysStore = usePublicHolidaysStore()
@@ -69,26 +70,12 @@ const emit = defineEmits(['onSaved'])
 const props = defineProps<{
   countryDetails: CountryInfo
 }>()
-const isCountryFavorite = ref(props.countryDetails.isFavorite)
 
-watch(
-  () => props.countryDetails.isFavorite,
-  (newValue) => {
-    isCountryFavorite.value = newValue
-  },
-)
+const isCountryFavorite = ref(props.countryDetails.isFavorite)
 
 const { availableCountries } = storeToRefs(publicHolidaysStore)
 
 const countryInfo = ref<CountryInfo | null>(null)
-
-onMounted(async () => {
-  await updateCountryInfo()
-})
-
-const updateCountryInfo = async () => {
-  countryInfo.value = await publicHolidaysStore.getCountryInfo(props.countryDetails.countryCode)
-}
 
 const selectCountry = async (countryCode: string) => {
   if (countryCode === props.countryDetails.countryCode) return
@@ -140,9 +127,17 @@ const getTextForTodayIsHoliday = computed(() => {
 watch(
   () => props.countryDetails,
   async () => {
-    await updateCountryInfo()
+    countryInfo.value = props.countryDetails
   },
   { immediate: true },
+)
+
+//watch changes in props.countryDetails.isFavorite and update isCountryFavorite
+watch(
+  () => props.countryDetails.isFavorite,
+  (newValue) => {
+    isCountryFavorite.value = newValue
+  },
 )
 </script>
 

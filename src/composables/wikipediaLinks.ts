@@ -1,6 +1,11 @@
 import { ref, onBeforeMount } from 'vue'
 import { devLog } from '@/utils/logger'
 import { setItemWithExpiration, getItemWithExpiration } from '@/utils/localStorageWithExpiration'
+import { ResultStatus } from '@/types/ApiResult'
+//Types
+import type { ApiResult } from '@/types/ApiResult'
+//Utils
+import { successResult, errorResult } from '@/utils/resultBuilder'
 
 type WikipediaLinks = {
   [key: string]: string
@@ -27,7 +32,7 @@ export function useWikipediaLinks() {
   }
 
   // Fetch wikipedia link from wikipedia api and save it in the state management
-  const fetchWikipediaLink = async (holidayName: string): Promise<string | null> => {
+  const fetchWikipediaLink = async (holidayName: string): Promise<ApiResult<string | null>> => {
     // To have a better match, we use the wikipedia api to search for the holiday name
     // if the is no 'holiday' string in the holiday name, we search we concact hollidayName
     // with 'holiday' string
@@ -42,7 +47,7 @@ export function useWikipediaLinks() {
 
     try {
       const response = await fetch(`${CONFIG.API_BASE_URL}?${params.toString()}`)
-      if (!response.ok) return null
+      if (!response.ok) return errorResult('Failed to fetch Wikipedia link', response.status)
 
       const data = await response.json()
 
@@ -52,24 +57,25 @@ export function useWikipediaLinks() {
         const wikiUrl = `https://en.wikipedia.org/wiki/${firstResult.title.replace(/ /g, '_')}`
         wikipediaLinks.value[holidayName] = wikiUrl
         setItemWithExpiration(CONFIG.STORAGE_KEY, wikipediaLinks.value, 10000)
-        return wikiUrl
+        return successResult(wikiUrl)
       } else {
         devLog('No search results found for:', holidayName)
-        return null
+        return errorResult('No search results found for: ' + holidayName, 404)
       }
     } catch (error) {
       devLog('Error fetching Wikipedia link:', error)
-      return null
+      return errorResult('Error fetching Wikipedia link', 500)
     }
   }
 
-  const getWikipediaLink = async (holidayName: string) => {
+  const getWikipediaLink = async (holidayName: string): Promise<ApiResult<string | null>> => {
     //if link already exists, return it
     if (wikipediaLinks.value[holidayName]) {
-      return wikipediaLinks.value[holidayName]
+      return successResult(wikipediaLinks.value[holidayName])
     } else {
-      const link = await fetchWikipediaLink(holidayName)
-      return link
+      const linkResult = await fetchWikipediaLink(holidayName)
+      if (linkResult.status === ResultStatus.ERROR) return linkResult
+      return successResult(linkResult.data)
     }
   }
 

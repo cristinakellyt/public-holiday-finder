@@ -1,6 +1,11 @@
 import { ref, onBeforeMount } from 'vue'
 import { devLog } from '@/utils/logger'
 import { setItemWithExpiration, getItemWithExpiration } from '@/utils/localStorageWithExpiration'
+import { ResultStatus } from '@/types/ApiResult'
+//Types
+import type { ApiResult } from '@/types/ApiResult'
+//Utils
+import { successResult, errorResult } from '@/utils/resultBuilder'
 
 const CONFIG = {
   STORAGE_KEY: 'countryFlag',
@@ -26,28 +31,30 @@ export function useCountryFlag() {
     }
   }
 
-  const fetchCountryFlag = async (countryCode: string) => {
+  const fetchCountryFlag = async (countryCode: string): Promise<ApiResult<string | null>> => {
     try {
       const response = await fetch(`${CONFIG.API_BASE_URL}/${countryCode}.webp`)
-      if (!response.ok) return null
+      if (!response.ok) return errorResult('Failed to fetch country flag', response.status)
 
       const flagUrl = response.url
       countriesFlagObj.value[countryCode] = flagUrl
       setItemWithExpiration(CONFIG.STORAGE_KEY, countriesFlagObj.value, 10000)
-      return flagUrl
+      return successResult(flagUrl)
     } catch (error) {
       devLog('Error while fetching country flag: ', error)
-      return null
+      return errorResult('Error while fetching country flag', 500)
     }
   }
 
-  const getCountryFlag = async (countryCode: string) => {
+  const getCountryFlag = async (countryCode: string): Promise<ApiResult<string | null>> => {
     const normalizedCountryCode = countryCode.toLowerCase()
     //if flag already exists, return it else fetch it
     if (countriesFlagObj.value[normalizedCountryCode]) {
-      return countriesFlagObj.value[normalizedCountryCode]
+      return successResult(countriesFlagObj.value[normalizedCountryCode])
     } else {
-      return await fetchCountryFlag(normalizedCountryCode)
+      const result = await fetchCountryFlag(normalizedCountryCode)
+      if (result.status === ResultStatus.ERROR) return result
+      return successResult(result.data)
     }
   }
 

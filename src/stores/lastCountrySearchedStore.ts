@@ -3,6 +3,7 @@ import { ref } from 'vue'
 //Types
 import type { PublicHoliday } from '@/types/publicHolidays'
 import type { LastCountrySearched } from '@/types/country'
+import { ResultStatus } from '@/types/ApiResult'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Composables
@@ -44,8 +45,19 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
 
     // No need to treat errors as the user doesn't reach this point if there is no available countries
     const name = await getCountryName(countryCode)
+    if (name === null) {
+      errorStatus.value = true
+      loadingStatus.value = false
+      return
+    }
     // Even if the flag is not found, we want to show the country name
-    const flagUrl = await getCountryFlag(countryCode)
+    const flag = await getCountryFlag(countryCode)
+    if (flag.status === ResultStatus.ERROR) {
+      errorStatus.value = true
+      loadingStatus.value = false
+      return
+    }
+    const flagUrl = flag.data
 
     const holidays = await getHolidays(countryCode)
     // If the holidays are not found, set the error status to true
@@ -56,10 +68,10 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
     }
 
     lastCountrySearched.value = {
-      countryCode: countryCode,
-      name: name,
-      flagUrl: flagUrl,
-      holidays: holidays,
+      countryCode,
+      name: name || '',
+      flagUrl,
+      holidays,
     }
     localStorage.setItem('lastCountrySearched', JSON.stringify(lastCountrySearched.value))
     loadingStatus.value = false
@@ -67,24 +79,29 @@ export const useLastCountrySearchedStore = defineStore('lastCountrySearched', ()
 
   const getCountryName = async (countryCode: string) => {
     const countries = await publicHolidaysStore.getAvailableCountries()
+    if (countries.status === ResultStatus.ERROR) {
+      return null
+    }
 
-    const countryName = countries.find((country) => country.countryCode === countryCode)?.name
-    return countryName ? countryName : ''
+    const countryName = countries.data.find((country) => country.countryCode === countryCode)?.name
+    return countryName
   }
 
   const getHolidays = async (countryCode: string) => {
     const holidays = await publicHolidaysStore.getPublicHolidaysByCountry(countryCode)
-    if (holidays === null) return null
+    if (holidays.status === ResultStatus.ERROR) return null
 
     //Find links in wikipediaLinks store and fill holidays with them if they exist
     //if not, fetch them
     await Promise.all(
-      holidays.map(async (holiday: PublicHoliday) => {
+      holidays.data.map(async (holiday: PublicHoliday) => {
         // Even if the wikipedia link is not found, we want to show the holiday name
-        holiday.wikipediaLink = await getWikipediaLink(holiday.name)
+        const link = await getWikipediaLink(holiday.name)
+        if (link.status === ResultStatus.ERROR) return
+        holiday.wikipediaLink = link.data
       }),
     )
-    return holidays
+    return holidays.data
   }
 
   return {

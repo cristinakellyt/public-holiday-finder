@@ -1,64 +1,66 @@
 <template>
-  <!-- Loading Status -->
-  <BaseSpinner :isLoading="loadingStatus" />
-  <!-- Error Message -->
-  <p class="error-message" v-if="tableData === null">
-    Sorry, we are experiencing issues, please try again later.
-  </p>
-  <div class="table-holidays-worldwide" v-if="tableData !== null && tableData.length > 0">
-    <BaseTable :options="tableOptions" :table-data="tablePaginatedData">
-      <!-- Title -->
-      <template #title>
-        <h2 class="title">Public Holidays Worldwide</h2>
-      </template>
-      <!-- Date -->
-      <template #date="{ rowData }">
-        {{ dateFormatter(rowData.date) }}
-      </template>
-      <!-- Holiday Name -->
-      <template #name="{ rowData }">
-        <div role="link">
-          <!-- If wikipedia link is not empty, we can click on the name and it will redirect to the wikipedia page -->
-          <a
-            v-if="rowData.wikipediaLink"
-            class="name"
-            :class="{ link: rowData.wikipediaLink }"
-            :href="rowData.wikipediaLink"
-            target="_blank"
-            >{{ rowData.name }}
-
-            <img
+  <div class="table-holidays-worldwide-container">
+    <!-- Loading Status -->
+    <BaseSpinner :isLoading="loadingStatus" />
+    <!-- Error Message -->
+    <p class="error-message" v-if="tableData === null">
+      Sorry, we are experiencing issues with public holidays worldwide, please try again later.
+    </p>
+    <div class="table-holidays-worldwide" v-if="tableData !== null && tableData.length > 0">
+      <BaseTable :options="tableOptions" :table-data="tablePaginatedData">
+        <!-- Title -->
+        <template #title>
+          <h2 class="title">Public Holidays Worldwide</h2>
+        </template>
+        <!-- Date -->
+        <template #date="{ rowData }">
+          {{ dateFormatter(rowData.date) }}
+        </template>
+        <!-- Holiday Name -->
+        <template #name="{ rowData }">
+          <div role="link">
+            <!-- If wikipedia link is not empty, we can click on the name and it will redirect to the wikipedia page -->
+            <a
               v-if="rowData.wikipediaLink"
-              :src="icRedirectLink"
-              alt="redirect-link"
-              class="redirect-icon"
-            />
-          </a>
-          <span v-else class="name">{{ rowData.name }}</span>
-        </div>
-      </template>
-      <!-- Country -->
-      <template #country="{ rowData }">
-        <div class="centralized-container">
-          <img v-if="rowData.flagUrl" :src="rowData.flagUrl" alt="country-flag" />
-          <span>{{ rowData.countryName }}</span>
-        </div>
-      </template>
-    </BaseTable>
-    <!-- Pagination -->
-    <BasePagination
-      v-if="tableData.length > pageSize"
-      :page-size="pageSize"
-      :total-items="tableData.length"
-      :current-page="currentPage"
-      @updateCurrentPage="updatePage"
-    />
+              class="name"
+              :class="{ link: rowData.wikipediaLink }"
+              :href="rowData.wikipediaLink"
+              target="_blank"
+              >{{ rowData.name }}
+
+              <img
+                v-if="rowData.wikipediaLink"
+                :src="icRedirectLink"
+                alt="redirect-link"
+                class="redirect-icon"
+              />
+            </a>
+            <span v-else class="name">{{ rowData.name }}</span>
+          </div>
+        </template>
+        <!-- Country -->
+        <template #country="{ rowData }">
+          <div class="centralized-container">
+            <img v-if="rowData.flagUrl" :src="rowData.flagUrl" alt="country-flag" />
+            <span>{{ rowData.countryName }}</span>
+          </div>
+        </template>
+      </BaseTable>
+      <!-- Pagination -->
+      <BasePagination
+        v-if="tableData.length > pageSize"
+        :page-size="pageSize"
+        :total-items="tableData.length"
+        :current-page="currentPage"
+        @updateCurrentPage="updatePage"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 //Vue
-import { onBeforeMount, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 //Utils
@@ -67,6 +69,7 @@ import dateFormatter from '@/utils/dateFormatter'
 import icRedirectLink from '@/assets/icons/ic_redirect_link.svg'
 //Types
 import type { PublicHoliday } from '@/types/publicHolidays'
+import { ResultStatus } from '@/types/ApiResult'
 
 const publicHolidaysStore = usePublicHolidaysStore()
 
@@ -85,10 +88,15 @@ const pageSize = ref(5)
 const loadingStatus = ref(true)
 
 //Fetch public holidays worldwide and fill data with flags and country name to display in table
-onBeforeMount(async () => {
-  tableData.value = await publicHolidaysStore.getPublicHolidaysWorldwide()
+onMounted(async () => {
+  const result = await publicHolidaysStore.getPublicHolidaysWorldwide()
+  if (result.status === ResultStatus.ERROR) {
+    tableData.value = null
+  } else {
+    tableData.value = result.data
+  }
   getPaginatedData()
-  tableData.value !== null ? (loadingStatus.value = false) : (loadingStatus.value = true)
+  loadingStatus.value = false
 })
 
 const updatePage = (page: number) => {
@@ -104,6 +112,11 @@ const getPaginatedData = () => {
 </script>
 
 <style scoped lang="scss">
+.table-holidays-worldwide-container {
+  width: 100%;
+  position: relative;
+}
+
 .table-holidays-worldwide {
   width: 100%;
 
