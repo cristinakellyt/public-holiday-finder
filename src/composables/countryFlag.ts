@@ -1,4 +1,4 @@
-import { ref, onBeforeMount } from 'vue'
+import { ref, onMounted } from 'vue'
 import { devLog } from '@/utils/logger'
 import { setItemWithExpiration, getItemWithExpiration } from '@/utils/localStorageWithExpiration'
 import { ResultStatus } from '@/types/ApiResult'
@@ -20,7 +20,7 @@ export function useCountryFlag() {
   const countriesFlagObj = ref<CountryFlag>({})
 
   // Load the country flag from the local storage
-  onBeforeMount(() => {
+  onMounted(() => {
     loadCountryFlag()
   })
 

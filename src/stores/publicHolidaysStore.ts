@@ -22,11 +22,11 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   const availableCountries = ref<Country[]>([])
   const publicHolidaysWorldwide = ref<PublicHoliday[]>([])
 
-  // create map of crountryName to Holidays
-  const countryHolidaysMap = ref<{ [key: string]: PublicHoliday[] }>({})
-  const isPublicHolidayTodayMap = ref<{ [key: string]: boolean }>({})
-  const publicHolidaysByYearMap = ref<{ [key: string]: PublicHoliday[] }>({})
-  const countryInfoMap = ref<{ [key: string]: CountryInfo }>({})
+  // Use Map for countryName to Holidays
+  const countryHolidaysMap = ref<Map<string, PublicHoliday[]>>(new Map())
+  const isPublicHolidayTodayMap = ref<Map<string, boolean>>(new Map())
+  const publicHolidaysByYearMap = ref<Map<string, PublicHoliday[]>>(new Map())
+  const countryInfoMap = ref<Map<string, CountryInfo>>(new Map())
 
   const favoritesCountriesStore = useFavoritesCountriesStore()
   const { favoritesCountries } = storeToRefs(favoritesCountriesStore)
@@ -107,8 +107,8 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     countryCode: string,
   ): Promise<ApiResult<PublicHoliday[]>> => {
     // Return data if already fetched, avoid fetching again
-    if (countryCode in countryHolidaysMap.value) {
-      return successResult(countryHolidaysMap.value[countryCode])
+    if (countryHolidaysMap.value.has(countryCode)) {
+      return successResult(countryHolidaysMap.value.get(countryCode)!)
     }
 
     try {
@@ -118,7 +118,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       }
 
       const data = (await response.json()) as PublicHoliday[]
-      countryHolidaysMap.value[countryCode] = data
+      countryHolidaysMap.value.set(countryCode, data)
       return successResult(structuredClone(data))
     } catch (error) {
       devLog('Error fetching public holidays by country:', error)
@@ -128,8 +128,8 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
 
   const isTodayPublicHoliday = async (countryCode: string): Promise<ApiResult<boolean>> => {
     // Return data if already fetched, avoid fetching again
-    if (countryCode in isPublicHolidayTodayMap.value) {
-      return successResult(isPublicHolidayTodayMap.value[countryCode])
+    if (isPublicHolidayTodayMap.value.has(countryCode)) {
+      return successResult(isPublicHolidayTodayMap.value.get(countryCode)!)
     }
 
     try {
@@ -139,7 +139,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       }
 
       const data = response.status === 200
-      isPublicHolidayTodayMap.value[countryCode] = data
+      isPublicHolidayTodayMap.value.set(countryCode, data)
       return successResult(data)
     } catch (error) {
       devLog('Error fetching if today is a public holiday:', error)
@@ -152,8 +152,9 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
     countryCode: string,
   ): Promise<ApiResult<PublicHoliday[]>> => {
     // Return data if already fetched, avoid fetching again
-    if (`${countryCode}-${year}` in publicHolidaysByYearMap.value) {
-      return successResult(publicHolidaysByYearMap.value[`${countryCode}-${year}`])
+    const key = `${countryCode}-${year}`
+    if (publicHolidaysByYearMap.value.has(key)) {
+      return successResult(publicHolidaysByYearMap.value.get(key)!)
     }
 
     try {
@@ -163,7 +164,6 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
       }
 
       const data = (await response.json()) as PublicHoliday[]
-
       // Add Wikipedia Link
       await Promise.all(
         data.map(async (holiday: PublicHoliday) => {
@@ -172,7 +172,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
           holiday.wikipediaLink = link.data
         }),
       )
-      publicHolidaysByYearMap.value[`${countryCode}-${year}`] = data
+      publicHolidaysByYearMap.value.set(key, data)
       return successResult(structuredClone(data))
     } catch (error) {
       devLog('Error fetching public holidays by year:', error)
@@ -181,8 +181,8 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   }
 
   const getCountryInfo = async (countryCode: string): Promise<ApiResult<CountryInfo>> => {
-    if (countryCode in countryInfoMap.value) {
-      return successResult(countryInfoMap.value[countryCode])
+    if (countryInfoMap.value.has(countryCode)) {
+      return successResult(countryInfoMap.value.get(countryCode)!)
     }
 
     try {
@@ -212,7 +212,7 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
 
       // Add if country is favorite
       data.isFavorite = favoritesCountries.value.includes(countryCode)
-      countryInfoMap.value[countryCode] = data
+      countryInfoMap.value.set(countryCode, data)
       return successResult(structuredClone(data))
     } catch (error) {
       devLog('Error fetching country info:', error)
@@ -221,8 +221,8 @@ export const usePublicHolidaysStore = defineStore('publicHolidays', () => {
   }
 
   const updateIfCountryIsFavorite = () => {
-    Object.keys(countryInfoMap.value).forEach((countryCode) => {
-      countryInfoMap.value[countryCode].isFavorite = favoritesCountries.value.includes(countryCode)
+    countryInfoMap.value.forEach((countryInfo, countryCode) => {
+      countryInfo.isFavorite = favoritesCountries.value.includes(countryCode)
     })
   }
 
