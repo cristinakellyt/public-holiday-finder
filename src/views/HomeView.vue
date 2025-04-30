@@ -4,23 +4,27 @@
       <SearchCountry />
       <MapComponent
         class="display-map"
-        :clickable-countries="getCountriesNames"
+        :clickable-countries="availableCountriesNames"
         @onCountrySelected="onCountrySelected"
         :selected-country="lastCountrySearched.name"
       />
       <!-- Error Message for when there are no countries available or if the last country searched is not available -->
       <p
         class="error-message"
-        v-if="(availableCountries.length === 0 && !loadingStatus) || errorStatus"
+        v-if="
+          (availableCountries.length === 0 && !lastCountrySearchedLoadingStatus) ||
+          lastCountrySearchedErrorStatus
+        "
       >
         Sorry, we are experiencing issues, please try again later.
       </p>
       <!-- Loading Status -->
-      <BaseSpinner :isLoading="firstLoad && loadingStatus" />
+      <BaseSpinner :isLoading="firstLoad && lastCountrySearchedLoadingStatus" />
       <!-- Country Detail Section -->
       <CountryDetailSection
         v-if="lastCountrySearched.countryCode && lastCountrySearched.holidays"
       />
+      <!-- Table of Holidays Worldwide -->
       <TableHolidaysWorldwide />
     </BaseWidth>
   </main>
@@ -42,10 +46,17 @@ import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
 const publicHolidaysStore = usePublicHolidaysStore()
 const lastCountrySearchedStore = useLastCountrySearchedStore()
 
-const { lastCountrySearched, loadingStatus, errorStatus } = storeToRefs(lastCountrySearchedStore)
+const {
+  lastCountrySearched,
+  loadingStatus: lastCountrySearchedLoadingStatus,
+  errorStatus: lastCountrySearchedErrorStatus,
+} = storeToRefs(lastCountrySearchedStore)
+
 const { availableCountries } = storeToRefs(publicHolidaysStore)
 
-const getCountriesNames = computed(() => availableCountries.value.map((country) => country.name))
+const availableCountriesNames = computed(() =>
+  availableCountries.value.map((country) => country.name),
+)
 const firstLoad = ref<boolean>(true)
 
 // Find country code selected in the map and set it in the store

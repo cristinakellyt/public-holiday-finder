@@ -50,6 +50,7 @@ import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useFavoritesCountriesStore } from '@/stores/favoritesCountriesStore'
 //Types
 import type { CountryInfo as TypeCountryInfo } from '@/types/country'
+import { ResultStatus } from '@/types/ApiResult'
 import { ToastType, ToastPosition } from '@/types/toast'
 //Utils
 import { toastManager } from '@/utils/ToastManager'
@@ -64,15 +65,25 @@ const countryData = ref<TypeCountryInfo | null>(null)
 watch(
   () => lastCountrySearched.value,
   async () => {
-    countryData.value = await publicHolidaysStore.getCountryInfo(
+    const countryDataResult = await publicHolidaysStore.getCountryInfo(
       lastCountrySearched.value.countryCode,
     )
+    if (countryDataResult.status === ResultStatus.ERROR) {
+      countryData.value = null
+    } else {
+      countryData.value = countryDataResult.data
+    }
   },
   { immediate: true },
 )
 
 const updateCountryData = async (countryCode: string) => {
-  countryData.value = await publicHolidaysStore.getCountryInfo(countryCode)
+  const countryDataResult = await publicHolidaysStore.getCountryInfo(countryCode)
+  if (countryDataResult.status === ResultStatus.ERROR) {
+    countryData.value = null
+  } else {
+    countryData.value = countryDataResult.data
+  }
 }
 
 const toggleFavoriteCountry = (isFavorite: boolean, countryCode: string) => {

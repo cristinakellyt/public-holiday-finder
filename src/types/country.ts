@@ -10,7 +10,7 @@ type CountryInfo = Country & {
   commonName: string
   officialName: string
   region: string
-  isHolidayToday: boolean
+  isHolidayToday: boolean | null
   isFavorite: boolean
   borders: CountryInfo[]
 }

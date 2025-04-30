@@ -15,15 +15,11 @@ import BaseToast from '@/components/BasicComponents/BaseToast.vue'
 //Stores
 import { usePublicHolidaysStore } from '@/stores/publicHolidaysStore'
 import { useLastCountrySearchedStore } from '@/stores/lastCountrySearchedStore'
-import { useWikipediaLinksStore } from '@/stores/wikipediaLinksStore'
-import { useCountryFlagStore } from '@/stores/countryFlagStore'
 //Utils
 import { devLog } from '@/utils/logger'
 
 const publicHolidaysStore = usePublicHolidaysStore()
 const lastCountrySearchedStore = useLastCountrySearchedStore()
-const wikipediaLinksStore = useWikipediaLinksStore()
-const countryFlagStore = useCountryFlagStore()
 
 onMounted(async () => {
   try {
@@ -31,8 +27,6 @@ onMounted(async () => {
     await publicHolidaysStore.getAvailableCountries()
     // Load stored states from Local Storage and preload them in the state management
     lastCountrySearchedStore.loadLastCountrySearched()
-    wikipediaLinksStore.loadWikipediaLinks()
-    countryFlagStore.loadCountryFlag()
   } catch (error) {
     devLog('Error at start-up: ', error)
   }

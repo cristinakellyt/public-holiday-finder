@@ -2383,16 +2383,6 @@ const emit = defineEmits(['onCountrySelected'])
 const currentlySelected = ref<string | null>(props.selectedCountry)
 const tooltip = ref<HTMLElement>()
 
-//watch selectedCountry and update currentlySelected through handleClick
-watch(
-  () => props.selectedCountry,
-  (newVal) => {
-    if (newVal) {
-      handleClick(new MouseEvent('click'), newVal)
-    }
-  },
-)
-
 // ------- Map functions -------
 
 //Some countries has more than one svg path, so we need to get all of them
@@ -2504,6 +2494,25 @@ onMounted(() => {
     })
   }
 })
+
+// Watch clickableCountries and setup map interactions
+watch(
+  () => props.clickableCountries,
+  () => {
+    setupMapInteractions()
+  },
+  { immediate: true },
+)
+
+//watch selectedCountry and update currentlySelected through handleClick
+watch(
+  () => props.selectedCountry,
+  (newVal) => {
+    if (newVal) {
+      handleClick(new MouseEvent('click'), newVal)
+    }
+  },
+)
 </script>
 
 <style scoped lang="scss">
